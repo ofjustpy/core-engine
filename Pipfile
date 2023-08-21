@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+py-tailwind-utils = "==1.1.1"
+itsdangerous = "*"
+psutil = "*"
+starlette = "*"
+uvicorn = "*"
+jinja2 = "*"
+addict-tracking-changes-fixed-attributes = "*"
+oj-signing-middleware = "==0.2.1"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"

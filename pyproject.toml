@@ -1,0 +1,39 @@
+[build-system]
+requires = ["flit_core >=3,<4"]
+build-backend = "flit_core.buildapi"
+
+
+[project]
+name = "ofjustpy-engine"
+readme = "README.md"
+license = { file="LICENSE" }
+maintainers = [
+ { name="Kabira K", email= "kabira@monallabs.in"}
+]
+requires-python = ">=3.11"
+classifiers=[
+    "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: User Interfaces",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License"
+    ]
+dynamic = ["version", "description"]
+dependencies = [ "addict-tracking-changes==1.0.6; python_version > '3.11'", "anyio==3.7.1; python_version >= '3.7'", "click==8.1.7; python_version >= '3.7'", "dpath==2.1.6; python_version >= '3.7'", "h11==0.14.0; python_version >= '3.7'", "idna==3.4; python_version >= '3.5'", "itsdangerous==2.1.2; python_version >= '3.7'", "json-fix==0.5.2; python_version >= '3.6'", "psutil==5.9.5; python_version >= '2.7'", "py-tailwind-utils==1.1.1","sniffio==1.3.0; python_version >= '3.7'", "starlette==0.31.0; python_version >= '3.8'", "uvicorn==0.23.2; python_version >= '3.8'", "jinja2==3.1.2; python_version >= '3.7'", "addict-tracking-changes-fixed-attributes==0.0.1; python_version >= '3.11'", "oj-signing-middleware" ]
+
+
+[project.urls]
+Home = "https://webworks.monallabs.in/ofjustpy/core-engine"
+Documentation = "https://monallabs-org.github.io/ofjustpy/core-engine"
+Source = "https://github.com/Monallabs-org/"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib"
+]
+
