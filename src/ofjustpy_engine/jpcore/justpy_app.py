@@ -24,6 +24,7 @@ from itsdangerous import Signer
 from . import AppDB
 from .justpy_config import JpConfig
 from .template import Context
+from ..WebPage_type_mixin import WebPageType
 from py_tailwind_utils import dget
 from starlette.applications import Starlette
 from starlette.authentication import requires as auth_requires
@@ -93,6 +94,11 @@ async def run_event_function(
     """
     dbref: the hc-object on which event is called
     """
+    print ("handle event for ", dbref.id, " ", event_type)
+
+
+    
+    
     event_function = dbref.get_event_handler("on_" + event_type)
 
     if create_namespace_flag:
@@ -189,7 +195,9 @@ async def handle_event(data_dict, com_type=0, page_event=False):
             print(traceback.format_exc())
         event_result = None
         logging.info("%s", traceback.format_exc())
+        print(traceback.format_exc())
         print("Event handling failed ", e)
+        raise e
 
     # If page is not to be updated, the event_function should return anything but None
     if event_result is None:
@@ -358,8 +366,9 @@ class JustpyApp(Starlette):
 
             """
             new_cookie = self.handle_session_cookie(request)
+            
             wp = await self.get_page_for_func(request, func)
-            response = self.get_response_for_load_page(request, wp)
+            response = wp.get_response_for_load_page(request)
             response = self.set_cookie(request, response, wp, new_cookie)
             if jpconfig.LATENCY:
                 await asyncio.sleep(jpconfig.LATENCY / 1000)
@@ -397,66 +406,66 @@ class JustpyApp(Starlette):
                 load_page = func_to_run()
         return load_page
 
-    def get_response_for_load_page(self, request, load_page):
-        """
-        get the response for the given webpage
+    # def get_response_for_load_page(self, request, load_page):
+    #     """
+    #     get the response for the given webpage
 
-        Args:
-            request(Request): the request to handle
-            load_page(WebPage): the webpage to wrap with justpy and
-            return as a full HtmlResponse
+    #     Args:
+    #         request(Request): the request to handle
+    #         load_page(WebPage): the webpage to wrap with justpy and
+    #         return as a full HtmlResponse
 
-        Returns:
-            Reponse: the response for the given load_page
-        """
-        page_options = {
-            "reload_interval": load_page.reload_interval,
-            "body_style": load_page.body_style,
-            "body_classes": load_page.classes,
-            "css": load_page.css,
-            "head_html": load_page.head_html,
-            "body_html": load_page.body_html,
-            "display_url": load_page.display_url,
-            # "dark": load_page.dark,
-            "title": load_page.title,
-            "redirect": load_page.redirect,
-            "debug": load_page.debug,
-            "events": load_page.events,
-            "favicon": load_page.favicon if load_page.favicon else jpconfig.FAVICON,
-        }
+    #     Returns:
+    #         Reponse: the response for the given load_page
+    #     """
+    #     page_options = {
+    #         "reload_interval": load_page.reload_interval,
+    #         "body_style": load_page.body_style,
+    #         "body_classes": load_page.classes,
+    #         "css": load_page.css,
+    #         "head_html": load_page.head_html,
+    #         "body_html": load_page.body_html,
+    #         "display_url": load_page.display_url,
+    #         # "dark": load_page.dark,
+    #         "title": load_page.title,
+    #         "redirect": load_page.redirect,
+    #         "debug": load_page.debug,
+    #         "events": load_page.events,
+    #         "favicon": load_page.favicon if load_page.favicon else jpconfig.FAVICON,
+    #     }
 
-        if load_page.use_cache:
-            page_dict = load_page.cache
-        else:
-            if hasattr(load_page, "to_json_optimized"):
-                page_json = load_page.build_json()
-                pass
-            else:
-                page_dict = load_page.build_list()
-                page_json = json.dumps(page_dict, default=str)
+    #     if load_page.use_cache:
+    #         page_dict = load_page.cache
+    #     else:
+    #         if hasattr(load_page, "to_json_optimized"):
+    #             page_json = load_page.build_json()
+    #             pass
+    #         else:
+    #             page_dict = load_page.build_list()
+    #             page_json = json.dumps(page_dict, default=str)
 
-        context = {
-            "request": request,
-            "page_id": load_page.page_id,
-            "justpy_dict": page_json,
-            "use_websockets": json.dumps(
-                load_page.use_websockets
-            ),  # json.dumps(WebPage.use_websockets),
-            "options": template_options,
-            "page_options": page_options,
-            "html": load_page.html,
-            "frontend_engine_type": jpconfig.FRONTEND_ENGINE_TYPE,
-            "frontend_engine_libs": jpconfig.FRONTEND_ENGINE_LIBS,
-        }
-        # wrap the context in a context object to make it available
+    #     context = {
+    #         "request": request,
+    #         "page_id": load_page.page_id,
+    #         "justpy_dict": page_json,
+    #         "use_websockets": json.dumps(
+    #             load_page.use_websockets
+    #         ),  # json.dumps(WebPage.use_websockets),
+    #         "options": template_options,
+    #         "page_options": page_options,
+    #         "html": load_page.html,
+    #         "frontend_engine_type": jpconfig.FRONTEND_ENGINE_TYPE,
+    #         "frontend_engine_libs": jpconfig.FRONTEND_ENGINE_LIBS,
+    #     }
+    #     # wrap the context in a context object to make it available
 
-        if not load_page.use_websockets:
-            logging.info("websocket turned off for this page")
-        context_obj = Context(context)
-        context["context_obj"] = context_obj
-        response = templates.TemplateResponse(load_page.template_file, context)
+    #     if not load_page.use_websockets:
+    #         logging.info("websocket turned off for this page")
+    #     context_obj = Context(context)
+    #     context["context_obj"] = context_obj
+    #     response = templates.TemplateResponse(load_page.template_file, context)
 
-        return response
+    #     return response
 
     def handle_session_cookie(self, request) -> typing.Union[bool, Response]:
         """

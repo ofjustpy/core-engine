@@ -6,7 +6,14 @@ This file represents the building block for mixins for webPage class.
 import asyncio
 
 from .jpcore import AppDB
+from enum import Enum
 
+class WebPageType(Enum):
+    PASSIVE_STATIC = 'PassiveStatic'
+    RESPONSIVE_STATIC = 'ResponsiveStatic'
+    OTHER = 'OTHER'
+
+    
 
 class WebPageMixin:
     # has no domDict or attrs attribute
@@ -27,8 +34,8 @@ class WebPageMixin:
         self.page_id = (
             self.session_manager.request.session_id + ":" + self.staticCore.id
         )
-        self.display_url = None
-        self.redirect = None
+        self.display_url = ''
+        self.redirect = ''
         self.open = None
 
         # non-http cookies ; accessible via javascript on the page
@@ -39,8 +46,14 @@ class WebPageMixin:
         self.body_style = ""
         self.body_classes = ""
         self.reload_interval = None
+        # rendering will depend on the webpage_type
+        # 
+        self.webpage_type = WebPageType.RESPONSIVE_STATIC
         AppDB.pageId_to_webpageInstance[self.page_id] = self
 
+        if 'template_file' in kwargs:
+            self.template_file = kwargs.get('template_file')
+            
         pass
 
     def build_json(self):
@@ -53,7 +66,7 @@ class WebPageMixin:
         )
 
     def get_changed_diff_patch(self):
-        print ("called WEBpage : get_changed_diff_patch")
+
         for obj in self.components:
             yield from obj.get_changed_diff_patch()
 
@@ -94,6 +107,7 @@ class WebPageMixin:
         Args:
             websocket(): The websocket to use (if any)
         """
+
         try:
             websocket_dict = AppDB.pageId_to_websockets[self.page_id]
         except:
@@ -102,6 +116,7 @@ class WebPageMixin:
         if self.to_json_optimized:
             # ================== Use optimized json ==================
             json_to_send = f"""{{ "type": "diff_patch_update",  "data" : {{ {",".join(self.get_changed_diff_patch())} }}    }}"""
+
 
             if websocket:
                 AppDB.loop.create_task(websocket.send_text(json_to_send))

@@ -20,6 +20,7 @@ class LabelMixin:
         for attr in ["for", "form"]:
             if attr in kwargs:
                 self.attrs[attr] = kwargs[attr]
+                self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
 
     @property
     def for_(self):
@@ -86,14 +87,14 @@ class ButtonMixin:
             "formtarget",
             "name",
             "type",
-            "value",
         ]:
             if key in kwargs:
                 self.attrs[key] = kwargs.get(key)
-
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
         if "value" in kwargs:
             self.domDict["value"] = kwargs.get("value")
-
+            self.htmlRender_attr.append(f'''value="{kwargs.get("value")}"''')
+            
     @property
     def value(self):
         """
@@ -235,7 +236,7 @@ class InputMixin:
     #self.value to the value coming from browser
     #apps retrieve value by msg.value from event handler.
     """
-
+    html_tag = "input"
     def __init__(self, *args, **kwargs):
         for k in ["name", "autofocus", "disabled", "readonly", "required", "form"]:
             if k in kwargs:
@@ -283,6 +284,7 @@ class TextInputMixin(InputMixin):
         ]:
             if attr in kwargs:
                 self.attrs[attr] = kwargs[attr]
+                self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
 
     @property
     def autocomplete(self):
@@ -391,6 +393,7 @@ class TextareaMixin(InputMixin):
         for attr in ["cols", "rows", "wrap", "placeholder"]:
             if attr in kwargs:
                 self.attrs[attr] = kwargs[attr]
+                self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
 
     @property
     def cols(self):
@@ -467,6 +470,7 @@ class OptionMixin:
         for attr in ["disabled", "label", "selected", "value"]:
             if attr in kwargs:
                 self.attrs[attr] = kwargs[attr]
+                self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
 
     @property
     def disabled(self):
@@ -554,7 +558,8 @@ class SelectInputMixin(InputMixin):
         ]:
             if attr in kwargs:
                 self.attrs[attr] = kwargs[attr]
-
+                self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
+                
     @property
     def multiple(self):
         """
@@ -655,78 +660,80 @@ class AMixin:
         ]:
             if key in kwargs:
                 self.attrs[key] = kwargs[key]
-
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
         if kwargs.get("bookmark", None) is not None:
-            bookmark = kwargs["bookmark"]
-            self.attrs["href"] = "#" + str(bookmark.id)
-            self.attrs["scroll_to"] = str(bookmark.id)
-
+            # bookmark = kwargs["bookmark"]
+            # self.attrs["href"] = "#" + str(bookmark.id)
+            # self.attrs["scroll_to"] = str(bookmark.id)
+            #TODO: needs to be implemented yet
+            pass
+            
     # Add getters and setters for the new attributes
 
-    @property
-    def bookmark(self):
-        """
-        The 'bookmark' attribute represents a reference to another element on the page.
-        When clicked, the hyperlink will scroll to the specified element.
-        """
-        return self.attrs.get("bookmark", None)
+    # @property
+    # def bookmark(self):
+    #     """
+    #     The 'bookmark' attribute represents a reference to another element on the page.
+    #     When clicked, the hyperlink will scroll to the specified element.
+    #     """
+    #     return self.attrs.get("bookmark", None)
 
-    @bookmark.setter
-    def bookmark(self, value):
-        if value is not None:
-            self.attrs["bookmark"] = value
-            self.attrs["href"] = "#" + str(value.id)
-            self.attrs["scroll_to"] = str(value.id)
-        elif "bookmark" in self.attrs:
-            del self.attrs["bookmark"]
+    # @bookmark.setter
+    # def bookmark(self, value):
+    #     if value is not None:
+    #         self.attrs["bookmark"] = value
+    #         self.attrs["href"] = "#" + str(value.id)
+    #         self.attrs["scroll_to"] = str(value.id)
+    #     elif "bookmark" in self.attrs:
+    #         del self.attrs["bookmark"]
 
-    @property
-    def scroll(self):
-        """
-        The 'scroll' attribute represents whether scrolling is enabled when the hyperlink is clicked.
-        If set to True, the browser will scroll to the specified element smoothly.
-        """
-        return self.attrs.get("scroll", False)
+    # @property
+    # def scroll(self):
+    #     """
+    #     The 'scroll' attribute represents whether scrolling is enabled when the hyperlink is clicked.
+    #     If set to True, the browser will scroll to the specified element smoothly.
+    #     """
+    #     return self.attrs.get("scroll", False)
 
-    @scroll.setter
-    def scroll(self, value):
-        self.attrs["scroll"] = value
+    # @scroll.setter
+    # def scroll(self, value):
+    #     self.attrs["scroll"] = value
 
-    @property
-    def scroll_option(self):
-        """
-        The 'scroll_option' attribute specifies the type of scrolling when the hyperlink is clicked.
-        Possible values are "auto" or "smooth".
-        """
-        return self.attrs.get("scroll_option", "smooth")
+    # @property
+    # def scroll_option(self):
+    #     """
+    #     The 'scroll_option' attribute specifies the type of scrolling when the hyperlink is clicked.
+    #     Possible values are "auto" or "smooth".
+    #     """
+    #     return self.attrs.get("scroll_option", "smooth")
 
-    @scroll_option.setter
-    def scroll_option(self, value):
-        self.attrs["scroll_option"] = value
+    # @scroll_option.setter
+    # def scroll_option(self, value):
+    #     self.attrs["scroll_option"] = value
 
-    @property
-    def block_option(self):
-        """
-        The 'block_option' attribute specifies the vertical alignment of the target element when scrolling.
-        Possible values are "start", "center", "end", or "nearest". Defaults to "start".
-        """
-        return self.attrs.get("block_option", "start")
+    # @property
+    # def block_option(self):
+    #     """
+    #     The 'block_option' attribute specifies the vertical alignment of the target element when scrolling.
+    #     Possible values are "start", "center", "end", or "nearest". Defaults to "start".
+    #     """
+    #     return self.attrs.get("block_option", "start")
 
-    @block_option.setter
-    def block_option(self, value):
-        self.attrs["block_option"] = value
+    # @block_option.setter
+    # def block_option(self, value):
+    #     self.attrs["block_option"] = value
 
-    @property
-    def inline_option(self):
-        """
-        The 'inline_option' attribute specifies the horizontal alignment of the target element when scrolling.
-        Possible values are "start", "center", "end", or "nearest". Defaults to "nearest".
-        """
-        return self.attrs.get("inline_option", "nearest")
+    # @property
+    # def inline_option(self):
+    #     """
+    #     The 'inline_option' attribute specifies the horizontal alignment of the target element when scrolling.
+    #     Possible values are "start", "center", "end", or "nearest". Defaults to "nearest".
+    #     """
+    #     return self.attrs.get("inline_option", "nearest")
 
-    @inline_option.setter
-    def inline_option(self, value):
-        self.attrs["inline_option"] = value
+    # @inline_option.setter
+    # def inline_option(self, value):
+    #     self.attrs["inline_option"] = value
 
     @property
     def href(self):
@@ -735,7 +742,11 @@ class AMixin:
 
     @href.setter
     def href(self, value):
+        if f'''href="{self.attrs["href"]}"''' in self.htmlRender_attr:
+            self.htmlRender_attr.remove(f'''href="{self.attrs["href"]}"''')
         self.attrs["href"] = value
+        self.htmlRender_attr.append(f'''href="{value}"''')
+        self.prepare_htmlRender()
 
 
 class SourceMixin:
@@ -844,27 +855,10 @@ class ImgMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "img"
-
-        if "alt" in kwargs:
-            self.attrs["alt"] = kwargs["alt"]
-        if "crossorigin" in kwargs:
-            self.attrs["crossorigin"] = kwargs["crossorigin"]
-        if "height" in kwargs:
-            self.attrs["height"] = kwargs["height"]
-        if "ismap" in kwargs:
-            self.attrs["ismap"] = kwargs["ismap"]
-        if "longdesc" in kwargs:
-            self.attrs["longdesc"] = kwargs["longdesc"]
-        if "sizes" in kwargs:
-            self.attrs["sizes"] = kwargs["sizes"]
-        if "src" in kwargs:
-            self.attrs["src"] = kwargs["src"]
-        if "srcset" in kwargs:
-            self.attrs["srcset"] = kwargs["srcset"]
-        if "usemap" in kwargs:
-            self.attrs["usemap"] = kwargs["usemap"]
-        if "width" in kwargs:
-            self.attrs["width"] = kwargs["width"]
+        for key in ["alt", "crossorigin", "height", "ismap", "longdesc", "sizes", "src", "srcset", "usemap", "width"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
 
     @property
     def alt(self):
@@ -878,8 +872,10 @@ class ImgMixin:
         if value is None:
             self.attrs.pop("alt", None)
         else:
+            self.htmlRender_attr.remove(f'''alt="{self.attrs["alt"]}"''')
             self.attrs["alt"] = value
-
+            self.htmlRender_attr.append(f'''alt="{self.attrs["alt"]}"''')
+            
     @property
     def crossorigin(self):
         """
@@ -893,7 +889,9 @@ class ImgMixin:
         if value is None:
             self.attrs.pop("crossorigin", None)
         else:
+            self.htmlRender_attr.remove(f'''crossorigin="{self.attrs["crossorigin"]}"''')
             self.attrs["crossorigin"] = value
+            self.htmlRender_attr.append(f'''crossorigin="{self.attrs["crossorigin"]}"''')
 
     @property
     def height(self):
@@ -907,7 +905,10 @@ class ImgMixin:
         if value is None:
             self.attrs.pop("height", None)
         else:
+            self.htmlRender_attr.remove(f'''height="{self.attrs["height"]}"''')
             self.attrs["height"] = value
+            self.htmlRender_attr.append(f'''height="{self.attrs["height"]}"''')
+    #TODO: fix for htmlRender_attr
 
     @property
     def ismap(self):
@@ -966,7 +967,7 @@ class H3Mixin:
     The `H3` class corresponds to the HTML `<h3>` element. It represents a third level heading.
     It's typically used for subheadings of the second-level heading (H2).
     """
-
+    html_tag = "h3"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h3"
         super().__init__(*args, **kwargs)
@@ -977,7 +978,7 @@ class H4Mixin:
     The `H4` class corresponds to the HTML `<h4>` element. It represents a fourth level heading.
     It's typically used for subheadings of the third-level heading (H3).
     """
-
+    html_tag = "h4"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h4"
         super().__init__(*args, **kwargs)
@@ -988,7 +989,7 @@ class H5Mixin:
     The `H5` class corresponds to the HTML `<h5>` element. It represents a fifth level heading.
     It's typically used for subheadings of the fourth-level heading (H4).
     """
-
+    html_tag = "h5"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h5"
         super().__init__(*args, **kwargs)
@@ -999,7 +1000,7 @@ class H6Mixin:
     The `H6` class corresponds to the HTML `<h6>` element. It represents the sixth and lowest level heading.
     It's typically used for subheadings of the fifth-level heading (H5).
     """
-
+    html_tag = "h6"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h6"
         super().__init__(*args, **kwargs)
@@ -1011,7 +1012,7 @@ class FormMixin:
     The attributes 'accept-charset', 'action', 'autocomplete', 'enctype', 'method', 'name', 'novalidate',
     and 'target' are used to configure the form's behavior and submission settings.
     """
-
+    html_tag = "form"
     def __init__(self, **kwargs):
         self.domDict.html_tag = "form"
         for attr in [
@@ -1026,6 +1027,7 @@ class FormMixin:
         ]:
             if attr in kwargs:
                 self.attrs[attr] = kwargs[attr]
+                self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
 
     # Add getters and setters for "accept-charset", "action", "autocomplete", "enctype", "method", "name", "novalidate", and "target"
 
@@ -1161,13 +1163,13 @@ class FormMixin:
 
 class NavMixin:
     """ """
-
+    html_tag = "nav"
     def __init__(self, **kwargs):
         self.domDict.html_tag = "nav"
 
 
 class FooterMixin:
     """ """
-
+    html_tag = "footer"
     def __init__(self, **kwargs):
         self.domDict.html_tag = "footer"

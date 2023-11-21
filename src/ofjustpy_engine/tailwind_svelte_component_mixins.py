@@ -1,6 +1,6 @@
 class CollapsibleMixin:
     vue_type = "Collapsible"
-
+    html_tag = "div"
     def __init__(
         self,
         hide_banner_text="The content is hidden. Click the button to expand.",
@@ -19,6 +19,7 @@ class CollapsibleMixin:
 # TODO: Svelte implementation of Switch is still not functional
 #
 class SwitchMixin:
+    html_tag = "div"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "div"
         self.domDict.vue_type = "Switch"

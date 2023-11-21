@@ -9,6 +9,9 @@ from . import HC_Div_type_mixins as TR
 from .mutable_TF_impl import CoreChildMixin
 from .mutable_TF_impl import DivMutable_JsonMixin
 from .mutable_TF_impl import HCCMixin_MutableChilds
+from .mutable_TF_impl import RenderHTML_HCCMutableChildsMixin
+from .mutable_TF_impl import RenderHTML_HCCStaticChildsMixin
+from .mutable_TF_impl import Prepare_HtmlRenderMixin
 from .mutable_TF_impl import HCCMixin_StaticChilds
 from .mutable_TF_impl import HCCMutable_JsonMixin
 from .mutable_TF_impl import HCCStatic_JsonMixin
@@ -57,6 +60,7 @@ def classTypeGen(
             StaticCore_JsonMixin,
             CoreChildMixin,
             hctag_mixin,
+            Prepare_HtmlRenderMixin
         ]
 
         shell_mixins = []
@@ -64,10 +68,12 @@ def classTypeGen(
 
     if is_childs_mutable:
         shell_mixins.append(HCCMixin_MutableChilds)
+        shell_mixins.append(RenderHTML_HCCMutableChildsMixin)
 
     else:
         core_mixins.append(HCCMixin_StaticChilds)
         static_core_sharer.append(StaticCoreSharer_HCCStaticMixin)
+        shell_mixins.append(RenderHTML_HCCStaticChildsMixin)
 
     match is_self_mutable, is_childs_mutable:
         case False, True:
@@ -95,13 +101,26 @@ def classTypeGen(
         def __init__(self, *args, **kwargs):
             self.domDict = Dict()
             self.attrs = Dict()
-            
+            self.htmlRender_attr = []
+            self.htmlRender_body = []
             for _ in core_mixins:
                 _.__init__(self, *args, **kwargs)
 
             for _ in static_core_mixins:
                 _.__init__(self, *args, **kwargs)
 
+
+        def post_id_assign_callback(self):
+            self.prepare_htmlRender()
+            pass
+        
+        def prepare_htmlRender(self):
+            self.htmlRender_chunk1 = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}'''
+            self.htmlRender_chunk2 = f'''>{"".join(self.htmlRender_body)}'''
+            self.htmlRender_chunk3 = f'''</{self.html_tag}>'''
+            
+            pass
+        
     class MutableShell(
         *static_core_sharer,
         *shell_mixins,
@@ -116,6 +135,8 @@ def classTypeGen(
                 self.domDict = Dict(track_changes=True)
 
             self.attrs = Dict(track_changes=True)
+            self.htmlRender_attr = []
+            self.htmlRender_body = []
             for _ in static_core_sharer:
                 _.__init__(self, *args, **kwargs)
 
@@ -125,6 +146,12 @@ def classTypeGen(
             for _ in mutable_shell_mixins:
                 _.__init__(self, *args, **kwargs)
 
+        def prepare_htmlRender(self):
+            """
+            mutable shells do not prepare render chunks
+            
+            """
             pass
+
 
     return StaticCore, MutableShell

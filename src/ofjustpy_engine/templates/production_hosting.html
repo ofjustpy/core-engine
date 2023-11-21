@@ -1,0 +1,33 @@
+{%- if not html %}<!DOCTYPE html>
+<html>
+  <!--This is a justpy application using the tailwind.html template-->
+  <head>
+    <base href={{options.base_url}}>
+    <script src="/templates/js/svelte/bundle.iife.js" defer></script>
+    <!-- <link href="/templates/js/svelte/style.css" rel="stylesheet" -->
+    <!--       type="text/css"> -->
+    <link href="/static/style.css" rel="stylesheet"
+          type="text/css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js" async></script>
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+
+{%- if page_options.css %}
+    <style>
+    {{ page_options.css }}
+    </style>
+{%- endif %}
+{%- if page_options.head_html %}
+{{ page_options.head_html | safe }}
+{%- endif %}
+    </head>
+    <body style="{{ page_options.body_style }}" class="{{ page_options.body_classes }}">
+    {{ page_options.body_html | safe }}
+   <div id="components">
+      </div>
+      {%- include 'main.html' -%}
+
+  </body>
+</html>
+{%- else %}{{ html | safe }}
+{%- endif %}

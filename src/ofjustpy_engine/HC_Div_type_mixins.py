@@ -21,8 +21,12 @@ class IdMixin:
     """
 
     def __init__(self, *args, **kwargs):
+        """
+        """
         self.attrs.id = kwargs.get("id", None)  # cls.stub.spath #cls.next_id
         self.domDict.id = self.attrs.id
+
+        
 
     @property
     def id(self):
@@ -32,6 +36,9 @@ class IdMixin:
     def id(self, value):
         self.domDict.id = value
         self.attrs.id = value
+        self.htmlRender_attr.append(f'''id="{self.attrs.id}"''')
+
+
 
 
 class KeyMixin:
@@ -60,7 +67,7 @@ class PassiveKeyIdMixin:
     
     @property
     def id(self):
-        return self
+        return self.key
 
     
 
@@ -251,7 +258,8 @@ class HCTextMixin:
         """
         if "text" in kwargs:
             self.domDict.text = kwargs.get("text")
-
+            self.htmlRender_body.append(self.domDict.text)
+            
     # getter/setters
     @property
     def text(self):
@@ -259,8 +267,11 @@ class HCTextMixin:
 
     @text.setter
     def text(self, value):
+        if self.domDict["text"]:
+            self.htmlRender_body.remove(self.domDict["text"])
         if value is not None:
             self.domDict["text"] = value
+            self.htmlRender_body.append(self.domDict["text"])
 
 
 class DivMixin:
@@ -278,7 +289,15 @@ class DivMixin:
     def html_tag(self, value):
         self.domDict.html_tag = value
 
+class SvelteSafelistMixin:
+    """
+    """
+    svelte_safelist = []
 
+    def __init__(self, *args, **kwargs):
+        pass
+    
+        
 class TwStyMixin:
     """Define and manipulate CSS styles via Tailwind tags.
 
@@ -307,6 +326,10 @@ class TwStyMixin:
 
     attr_tracked_keys = []
     domDict_tracked_keys = ["classes"]
+    # svelte_safelist tracks twtags that are introduced
+    # during event handling.
+    # by default its empty. Components such as stackD etc.
+    # override this. 
 
     def __init__(self, *args, **kwargs):
         self.twsty_tags = kwargs.get("twsty_tags", [])
@@ -315,24 +338,36 @@ class TwStyMixin:
         else:
             self.domDict.classes = tstr(*self.twsty_tags)
 
+        self.htmlRender_attr.insert(0, f'''class="{self.classes}"''')
         if "style" in kwargs:
             self.attrs["style"] = kwargs.get("style")
+        if self.style:
+            self.htmlRender_attr.append(f'''style="{self.style}"''')
+
+        
 
     def remove_twsty_tags(self, *args):
         for _ in args:
             remove_from_twtag_list(self.twsty_tags, _)
         self.domDict.classes = tstr(*self.twsty_tags)
+        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
 
     def add_twsty_tags(self, *args):
         self.twsty_tags = conc_twtags(*self.twsty_tags, *args)
         self.domDict.classes = tstr(*self.twsty_tags)  # change the domDict directly
-
+        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
+        # prepare_htmlRender: applies only for active/passive and staticCore components
+        # for mutable components to_html assembles htmlRender on every call
+        self.prepare_htmlRender()
+        
     def replace_twsty_tags(self, *args):
         """
         replace the existing twsty_tags with ones in *args
         """
         self.twsty_tags = args
         self.domDict.classes = tstr(*self.twsty_tags)  # change the domDict directly
+        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
+        self.prepare_htmlRender()
         pass
 
     @property
@@ -423,6 +458,8 @@ class EventMixinBase:
 
             if event_type not in self.domDict.events:
                 self.domDict.events.append(event_type)
+            self.htmlRender_attr.append(f"""on{event_type}='eventHandler(event)'""")
+            
             # if debounce:
             #     self.domDict.event_modifiers[event_type].debounce = {
             #         "value": debounce,
@@ -436,6 +473,8 @@ class EventMixinBase:
             #     }
         else:
             raise Exception(f"No event of type {event_type} supported")
+        # events have changed: repare the htmlRenderer
+        self.prepare_htmlRender()
 
     def add_prehook(self, prehook_func):
         """
@@ -447,8 +486,10 @@ class EventMixinBase:
                 self.event_handlers["on_" + e] = prehook_func(ufunc)
 
     def remove_event(self, event_type):
-        if event_type in self.domDict.events:
-            self.domDict.events.remove(event_type)
+        # if event_type in self.domDict.events:
+        #     self.domDict.events.remove(event_type)
+        # self.htmlRender_attr.remove(f"""on{event_type}='eventHandler(event)'""")
+        raise Exception("Implemented -- but to be tested")
 
     def has_event_function(self, event_type):
         if getattr(self, "on_" + event_type, None):
@@ -578,3 +619,6 @@ class EventMixin(EventMixinBase):
 
     def __init__(self, *args, **kwargs):
         EventMixinBase.__init__(self, *args, **kwargs)
+        
+        #self.htmlRender_attr.extend([f"""on{key}='eventHandler(event)'""" for key in map(lambda _: _.split("_")[1], self.event_handlers.keys())])
+        

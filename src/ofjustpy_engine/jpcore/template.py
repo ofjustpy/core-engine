@@ -90,7 +90,7 @@ class Context:
             srcs += self.as_script_src(
                 file_name, indent, subdir=self.component_engine_type
             )
-        srcs += f"{indent}<script src='/templates/js/jsonpatch.js' ></script>\n"
+        srcs += f"{indent}<script src='/templates/js/jsonpatch.js' defer></script>\n"
         return srcs
 
     def as_javascript_setup(self, indent):

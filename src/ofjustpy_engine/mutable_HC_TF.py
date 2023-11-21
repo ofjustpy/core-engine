@@ -47,6 +47,30 @@ class HCTextPropertyMixin:
             self.domDict["text"] = value
 
 
+class RenderHTMLMixin:
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def build_renderHtml(self):
+        assert False
+        
+    def to_html(self):
+        self.htmlRender = f'''{self.staticCore.htmlRender_chunk1} {" ".join(self.htmlRender_attr)}{self.staticCore.htmlRender_chunk2}{"".join(self.htmlRender_body)}{self.staticCore.htmlRender_chunk3}'''
+        
+        return self.htmlRender
+
+    def to_html_iter(self):
+        self.htmlRender = f'''{self.staticCore.htmlRender_chunk1} {" ".join(self.htmlRender_attr)}{self.staticCore.htmlRender_chunk2}{"".join(self.htmlRender_body)}{self.staticCore.htmlRender_chunk3}'''
+        yield self.htmlRender
+
+    def prepare_htmlRender(self):
+        """
+        mutable shells do not prepare render chunks
+        
+        """
+        pass
+    pass
+
 def classTypeGen(
     hc_tag,
     hctag_mixin,
@@ -101,6 +125,8 @@ def classTypeGen(
         def __init__(self, *args, **kwargs):
             self.domDict = Dict()
             self.attrs = Dict()
+            self.htmlRender_attr = []
+            self.htmlRender_body = []
             self.key = kwargs.get("key", None)
             for _ in core_mixins:
                 _.__init__(self, *args, **kwargs)
@@ -111,6 +137,16 @@ def classTypeGen(
             for _ in staticCore_addonMixins:
                 _.__init__(self, *args, **kwargs)
 
+        def post_id_assign_callback(self):
+            self.prepare_htmlRender()
+            pass
+        def prepare_htmlRender(self):
+            
+            self.htmlRender_chunk1 = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}'''
+            self.htmlRender_chunk2 = f'''>{"".join(self.htmlRender_body)}'''
+            self.htmlRender_chunk3 = f'''</{self.html_tag}>'''
+            
+            pass
     class MutableShell(
         TR.DOMEdgeMixin,
         HCMutable_JsonMixin,
@@ -118,6 +154,7 @@ def classTypeGen(
         *mutableShellMixins,
         *mutableShell_addonMixins,
         *mutableShell_auxMixins,
+            RenderHTMLMixin
     ):
         def __init__(self, *args, **kwargs):
             if len(domDict_tracked_keys) == 0:
@@ -134,6 +171,9 @@ def classTypeGen(
             else:
                 self.attrs = Dict(track_changes=True)
 
+            self.htmlRender_attr = []
+            self.htmlRender_body = []
+            
             TR.DOMEdgeMixin.__init__(self, *args, **kwargs)
             HCMutable_JsonMixin.__init__(self, *args, **kwargs)
             for _ in sharerMixins:
@@ -145,6 +185,7 @@ def classTypeGen(
             for _ in mutableShell_addonMixins:
                 _.__init__(self, *args, **kwargs)
 
+            RenderHTMLMixin.__init__(self, *args, **kwargs)
             pass
 
     return StaticCore, MutableShell

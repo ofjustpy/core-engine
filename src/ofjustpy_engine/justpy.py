@@ -99,6 +99,7 @@ def build_app(
         StaticFiles(directory=jpconfig.STATIC_DIRECTORY),
         name=jpconfig.STATIC_NAME,
     )
+
     app.mount(
         "/templates",
         StaticFiles(directory=current_dir + "/templates"),

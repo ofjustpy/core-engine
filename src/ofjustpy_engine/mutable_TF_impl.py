@@ -7,7 +7,14 @@ import json
 from addict_tracking_changes import Dict
 from py_tailwind_utils import dget
 
-
+class StaticCore_HCRenderHTMLTemplateMixin:
+    def __init__(self, *args, **kwargs):
+        attrs_kv =" ".join([f'{key}="{value}"' for key, value in self.attrs.items()])
+        event_handlers = ' '.join([f"""on{key}='eventHandlers.{key}'""" for key in map(lambda _: _.split("_")[1], self.event_handlers.keys())])
+        
+        self.html_render_template = f"""<{self.html_tag} {attrs_kv} {{}}" {event_handlers}>{self.text}</{self.html_tag}>"""
+        pass
+    
 class StaticCore_JsonMixin:
     def __init__(self, *args, **kwargs):
         self.json_domDict = None
@@ -58,7 +65,7 @@ class JsonMixin_Base:
         is_hidden = False  # shipping hidden as awell  "hidden" in self.classes
 
         if parent_hidden:
-            object_props_json = "[]"
+            object_props_json = "[]" #no need to ship json of childs if parent is hidden
         else:
             object_props_json = self.get_obj_props_json(parent_hidden=is_hidden)
 
@@ -312,7 +319,7 @@ class HCCMixin_MutableChilds:
             c_(self)
             if not c_.is_static():
                 self.spathMap[c_.id] = c_.target
-
+                
     def add_component(self, child, position=None, slot=None):
         """
         add a component
@@ -331,15 +338,63 @@ class HCCMixin_MutableChilds:
 
         return self
 
+class Prepare_HtmlRenderMixin:
+    attr_tracked_keys = []
+    domDict_tracked_keys = []
+    def __init__(self, *args, **kwargs):
+        # Since there is no assign id phase for HCCMutable
+        # prepare_htmlRender can be called during init itself
+        self.prepare_htmlRender()
+        pass
+    
+    
+class RenderHTML_HCCMutableChildsMixin:
+    attr_tracked_keys = []
+    domDict_tracked_keys = []
+    def __init__(self, *args, **kwargs):
+        # Since there is no assign id phase for HCCMutable
+        # prepare_htmlRender can be called during init itself
+        pass
+
+    def to_html_iter(self):
+        yield f'''{self.staticCore.htmlRender_chunk1}'''
+        yield f''' {" ".join(self.htmlRender_attr)}{self.staticCore.htmlRender_chunk2}{"".join(self.htmlRender_body)}'''
+        
+        for c in self.components:
+             yield from c.to_html_iter()
+        yield f'''{self.staticCore.htmlRender_chunk3}'''
+
+
+class RenderHTML_HCCStaticChildsMixin:
+    """
+    for now just copying the HCCMutable log
+    
+    """
+    attr_tracked_keys = []
+    domDict_tracked_keys = []
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def to_html_iter(self):
+        """
+        childs html are included by the staticCore
+        """
+        yield f'''{self.staticCore.htmlRender_chunk1}'''
+        yield f''' {" ".join(self.htmlRender_attr)}{self.staticCore.htmlRender_chunk2}{"".join(self.htmlRender_body)}'''
+        for c in self.components:
+            yield from c.to_html_iter()
+        
+        yield f'''{self.staticCore.htmlRender_chunk3}'''        
+            
 
 class HCCMixin_StaticChilds:
     def __init__(self, **kwargs):
-        # for active childs are not added via stub-callable route
-        # the target is directly added
         self.components = kwargs.get("childs")
-        # cannot add_register_childs here
-        # childs could be active and there should only be registered in the mutable part
-        # self.add_register_childs()
+        # do not register static childs here (as in part of the init of staticCore)
+        # active componenent require session manager to be registered
+        # register childs as part of stub().__call__
+        # we also cannot prepare the html if the childs have not been registered
+        # register and prepare happens as part of StaticCoreSharer
 
     def add_register_childs(self):
         # TODO: still need to call child.stub with attach to parents false
@@ -351,10 +406,17 @@ class HCCMixin_StaticChilds:
         for c in self.components:
             c_ = c.stub()
             c_(self, attach_to_parent=False)
-
-
+            # The A href update curse: we cannot precompute
+            # childrens because of A.href is update upon request
+            #self.htmlRender_body.append(c.to_html())
+            
 # ================================ end ===============================
 
+
+
+
+
+            
 
 # ========================= staticCore sharer ========================
 class StaticCoreSharer_BaseMixin:
@@ -400,6 +462,11 @@ class StaticCoreSharer_IdMixin:
     @property
     def key(self):
         return self.staticCore.key
+
+    @property
+    def html_tag(self):
+        return self.staticCore.html_tag
+    
         
 
 class StaticCoreSharer_ValueMixin:
@@ -416,6 +483,7 @@ class StaticCoreSharer_ValueMixin:
 class StaticCoreSharer_HCCStaticMixin:
     def __init__(self, *args, **kwargs):
         self.staticCore.add_register_childs()
+        self.staticCore.prepare_htmlRender()
         pass
 
     def get_obj_prop_json(self):
