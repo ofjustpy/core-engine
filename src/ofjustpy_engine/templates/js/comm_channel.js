@@ -8,10 +8,10 @@ var msg = null;
 var websocket_id = '';
 var websocket_ready = false;
 var web_socket_closed = false;
-class JustpyCore {
+class CommChannelHandler {
 
 	/**
-	 * create a JustpyCore instance
+	 * create a CommChannelHandler instance: open websocket channel; send/recieve msgs; invoke action based on incoming msg types. 
 	 * @param window
 	 * @param {number} page_id - id of the page
 	 * @param title - title of the document
@@ -110,7 +110,6 @@ class JustpyCore {
 		});
 
 	    socket.addEventListener('message', function(event) {
-		console.log('message Event listen', event);
 			this.handleMessageEvent(event);
 		}.bind(this));  // handover the class context to the event listener function
 	}

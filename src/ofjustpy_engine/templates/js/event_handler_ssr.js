@@ -16,7 +16,7 @@ function eventHandler(event) {
         'page_id': justpy_core.page_id,
         'websocket_id': websocket_id,
     };
-    send_to_server(e, 'event');
+    send_to_server_ssr(e, 'event');
 }
 
 /**
@@ -25,7 +25,7 @@ function eventHandler(event) {
  * @param {string} event_type - type of the event
  * @param {boolean} debug_flag - If true show debug messages in the console
  */
-function send_to_server(e, event_type, debug_flag) {
+function send_to_server_ssr(e, event_type, debug_flag) {
 
     if (use_websockets) {
         if (web_socket_closed) {

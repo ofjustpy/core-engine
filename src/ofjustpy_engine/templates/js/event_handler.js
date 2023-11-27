@@ -6,7 +6,7 @@
 
 var files_chosen = {};
 
-function eventHandler(props, event, form_data, aux) {
+function eventHandler_CSR(props, event, form_data, aux) {
     //if (props.jp_props.debug) {
         console.log('-------------------------');
         console.log('In eventHandler: ' + event.type + '  ' + props.jp_props.vue_type + '  ' + props.jp_props.class_name);
@@ -15,7 +15,7 @@ function eventHandler(props, event, form_data, aux) {
         console.log('-------------------------');
 //}
     if (!websocket_ready && use_websockets) {
-        setTimeout(function(){ eventHandler(props, event, form_data, aux); }, 100);
+        setTimeout(function(){ eventHandler_CSR(props, event, form_data, aux); }, 100);
         return;
     }
     let event_type = event.type;

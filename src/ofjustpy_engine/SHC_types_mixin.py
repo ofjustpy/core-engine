@@ -221,58 +221,37 @@ class HCCActiveMixin(HCCStaticMixin):
 
 class PassiveHC_RenderHTMLMixin:
     def __init__(self, *args, **kwargs):
-
-        self.htmlRender = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
+        self.prepare_htmlRender()
         pass
 
     def build_renderHtml(self):
-        
         pass
     
     def prepare_htmlRender(self):
         # mutable shell's staticCore have
         # prepare_htmlRender which gets
         # updated after update to attrs
-
         self.htmlRender = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
 
-    def to_html(self):
-        # The url_for curse of A tag
-        #return self.htmlRender
-        return f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
-
     def to_html_iter(self):
-        #yield self.htmlRender
-        self.prepare_htmlRender()
-        yield f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
-        
+        yield self.htmlRender
 
 
 
 class ActiveDiv_RenderHTMLMixin:
     def __init__(self, *args, **kwargs):
-        # attach all childrens htmls
-        # this might get called after
-        # prepare_htmlRender call from eventMixin may 
-        # already populate so htmlRender_body
-        self.htmlRender_body = []
-        for achild in self.components:
-            self.htmlRender_body.append(achild.to_html())
+        # can prepare htmlrender now as id is not assigned yet.
+        # wait for assign_id callback to be done
         pass
 
     def post_id_assign_callback(self):
-        self.build_renderHtml()
-        
+        self.prepare_htmlRender()
         pass
     
     def build_renderHtml(self):
-        self.htmlRender = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
-    def to_html(self):
-        # because oj.AC.A href attribute is big problem
-        # it is updated at runtime we will not
-        # precompute htmlRender...instead generate it on the fly
-        # return self.htmlRender
-        return  f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
+        self.htmlRender_open_tag = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>'''
+        self.htmlRender_close_tag =  f'''</{self.html_tag}>'''
+        
 
     def prepare_htmlRender(self):
         # mutable shell's staticCore have
@@ -281,21 +260,17 @@ class ActiveDiv_RenderHTMLMixin:
         # prepare_htmlRender is also called
         # by eventMixin following .on
         # event addition. 
-        self.htmlRender_body = []
-
-        for achild in self.components:
-            self.htmlRender_body.append(achild.to_html())
         self.build_renderHtml()
-
-        
     def to_html_iter(self):
-        self.prepare_htmlRender()
-        yield f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
+        yield self.htmlRender_open_tag
+        for achild in self.components:
+            yield from achild.to_html_iter()
+        yield self.htmlRender_close_tag
 
 
 class ActiveHC_RenderHTMLMixin:
-    # We cannot build_renderHtml at init
-    # because id is assigned by assign_id
+    # We cannot build_renderHtml at init.
+    # because id is assigned by assign_id which is called
     # after the object has been initialized
     
     def __init__(self, *args, **kwargs):
@@ -315,23 +290,15 @@ class ActiveHC_RenderHTMLMixin:
         # prepare_htmlRender which gets
         # updated after update to attrs
         self.build_renderHtml()
-    def to_html(self):
-        #return self.htmlRender
-        return f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
-    
 
+    
     def to_html_iter(self):
-        #yield self.htmlRender
-        yield f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
+        yield self.htmlRender
 
 
 
 class PassiveDiv_RenderHTMLMixin:
     def __init__(self, *args, **kwargs):
-        # collect the html of childrens
-        for achild in self.components:
-            self.htmlRender_body.append(achild.to_html())
-        # build the final html
         self.build_renderHtml()
         pass
 
@@ -339,44 +306,21 @@ class PassiveDiv_RenderHTMLMixin:
         # mutable shell's staticCore have
         # prepare_htmlRender which gets
         # updated after update to attrs
-        self.htmlRender_body = []
-        for achild in self.components:
-            self.htmlRender_body.append(achild.to_html())
-            
         self.build_renderHtml()
         
     def build_renderHtml(self):
+        self.htmlRender_open_tag = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>'''
+        self.htmlRender_close_tag = f'''</{self.html_tag}>'''
         
-        self.htmlRender = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
 
-    def to_html(self):
-        # see ActiveDiv.to_htmlRender
-        #return self.htmlRender
-        self.prepare_htmlRender()
-        return f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
-        
 
     def to_html_iter(self):
-        #yield self.htmlRender
-        self.prepare_htmlRender()
-        yield f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
+        yield self.htmlRender_open_tag
+        for achild in self.components:
+            yield from achild.to_html_iter()
+        yield self.htmlRender_close_tag
     
 
-
-    
-# class ActiveHC_RenderHTMLMixin:
-#     def __init__(self, *args, **kwargs):
-#         pass
-
-#     def to_html(self):
-#         event_handlers = ' '.join([f"""on{key}='eventHandlers.{key}'""" for key in map(lambda _: _.split("_")[1], self.event_handlers.keys())])
-        
-#         attrs_kv =" ".join([f'{key}="{value}"' for key, value in self.attrs.items()])
-#         return f"""<{self.html_tag} {attrs_kv} class="{self.classes}" {event_handlers}>{self.text}</{self.html_tag}>"""
-        
-#         pass
-
-    
 def staticClassTypeGen(
     taglabel="Label",
     tagtype=TR.LabelMixin,
