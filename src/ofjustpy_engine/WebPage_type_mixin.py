@@ -40,7 +40,7 @@ class WebPageMixin:
 
         # non-http cookies ; accessible via javascript on the page
         self.css = ""
-        self.head_html = ""
+        self.head_html = kwargs.get("head_html", "")
         self.body_html = ""
         self.html = ""
         self.body_style = ""

@@ -158,7 +158,7 @@ class HCCStaticMixin:
     def __init__(self, **kwargs):
         # active childs are not added via stub-callable route
         # the target is directly added
-        self.components = kwargs.get("childs")
+        self.components = kwargs.get("childs", [])
 
 
 # class HCCMixin:
@@ -187,7 +187,7 @@ class HCCStaticMixin:
     """
 
     def __init__(self, *args, **kwargs):
-        self.components = kwargs.get("childs")
+        self.components = kwargs.get("childs", [])
 
         
     def add_register_childs(self):
@@ -332,9 +332,6 @@ def staticClassTypeGen(
     addon_mixins=[],
     **kwargs,
 ):
-    if addon_mixins:
-        raise ValueError("addon_mixins not implemented yet")
-
     def constructor(self, *args, **kwargs):
         self.htmlRender_attr = []
         self.htmlRender_body = []
@@ -359,7 +356,7 @@ def staticClassTypeGen(
             http_request_callback_mixin.__init__(self, *args, **kwargs)
 
         else:
-            TR.PassiveKeyIdMixin.__init__(self, *args, **kwargs)
+            TR.PassiveKeyMixin.__init__(self, *args, **kwargs)
         # JsonMixin should come after HCCMixin
         jsonMixinType.__init__(self, *args, **kwargs)
 
@@ -377,6 +374,9 @@ def staticClassTypeGen(
                 PassiveHC_RenderHTMLMixin.__init__(self, *args, **kwargs)
                 pass
 
+        for _ in addon_mixins:
+            _.__init__(self, *args, **kwargs)
+            
     base_types = (StaticCore, tagtype, TR.SvelteSafelistMixin)
     if make_container:
         if attach_event_handling:
@@ -397,7 +397,7 @@ def staticClassTypeGen(
         else:
             base_types = (StaticCore,
                           TR.SvelteSafelistMixin,
-                          TR.PassiveKeyIdMixin,
+                          TR.PassiveKeyMixin,
                           jsonMixinType,
                           tagtype,
                           hccMixinType,
@@ -421,7 +421,7 @@ def staticClassTypeGen(
         else:
             base_types = (StaticCore,
                           TR.SvelteSafelistMixin,
-                          TR.PassiveKeyIdMixin,
+                          TR.PassiveKeyMixin,
                           jsonMixinType,
                           tagtype,
                           TR.HCTextMixin,
@@ -430,7 +430,7 @@ def staticClassTypeGen(
 
     return type(
         taglabel,
-        base_types,
+        (*base_types, *addon_mixins),
         {
             # constructor
             "__init__": constructor

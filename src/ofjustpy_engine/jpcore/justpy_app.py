@@ -94,12 +94,7 @@ async def run_event_function(
     """
     dbref: the hc-object on which event is called
     """
-    print ("handle event for ", dbref.id, " ", event_type)
-
-
-    
-    
-    event_function = dbref.get_event_handler("on_" + event_type)
+    event_function = dbref.get_event_handler(event_type)
 
     if create_namespace_flag:
         function_data = Dict(event_data)
@@ -507,7 +502,7 @@ class JustpyApp(Starlette):
             new_cookie(bool|Response): True if there is a new cookie. Or Response if cookie was invalid
         """
         if isinstance(new_cookie, Response):
-            print("returning without cookie setting")
+            #print("returning without cookie setting")
             return new_cookie
 
         if jpconfig.SESSIONS and new_cookie:
@@ -545,8 +540,6 @@ class JustpyAjaxEndpoint(HTTPEndpoint):
             request(Request): the request to handle
         """
         data_dict = await request.json()
-        # print ("handling post: request body : data_dict_keys = ", data_dict)
-        # print ("handling post : response headers = ", request.headers.keys())
         form = await request.form()
 
         # {'type': 'event', 'event_data': {'event_type': 'beforeunload', 'page_id': 0}}

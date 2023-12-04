@@ -92,7 +92,7 @@ class JpConfig(Config):
                 "FRONTEND_ENGINE_TYPE", cast=str, default="svelte"
             )
             jpconfig.BASE_URL = config(
-                "BASE_URL", cast=str, default="http://rpifedoradesktop:8000/"
+                "BASE_URL", cast=str, default="http://localhost:8000"
             )
 
             jpconfig.USE_COOKIE_MIDDLEWARE = config(

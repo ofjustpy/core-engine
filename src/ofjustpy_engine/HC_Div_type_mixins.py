@@ -54,7 +54,7 @@ class KeyMixin:
 
 
         
-class PassiveKeyIdMixin:
+class PassiveKeyMixin:
     """For passive objects, define their key to be their python object id
     """
 
@@ -63,11 +63,11 @@ class PassiveKeyIdMixin:
 
     @property
     def key(self):
-        return id(self)
+        """
+        dpathutils doesn't work for put int keys
+        """
+        return "po_"+str(id(self))
     
-    @property
-    def id(self):
-        return self.key
 
     
 
@@ -502,7 +502,7 @@ class EventMixinBase:
             self.allowed_events.append(event_type)
 
     def get_event_handler(self, event_type):
-        return self.event_handlers[event_type]
+        return self.event_handlers['on_' + event_type]
 
     def add_allowed_event(self, event_type):
         self.add_event(event_type)

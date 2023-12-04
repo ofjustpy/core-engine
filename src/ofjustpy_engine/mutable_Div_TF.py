@@ -56,7 +56,7 @@ def classTypeGen(
         core_mixins = [
             TR.jpBaseComponentMixin,
             TR.TwStyMixin,
-            TR.PassiveKeyIdMixin,
+            TR.PassiveKeyMixin,
             StaticCore_JsonMixin,
             CoreChildMixin,
             hctag_mixin,

@@ -389,7 +389,7 @@ class RenderHTML_HCCStaticChildsMixin:
 
 class HCCMixin_StaticChilds:
     def __init__(self, **kwargs):
-        self.components = kwargs.get("childs")
+        self.components = kwargs.get("childs", [])
         # do not register static childs here (as in part of the init of staticCore)
         # active componenent require session manager to be registered
         # register childs as part of stub().__call__
@@ -438,7 +438,9 @@ class StaticCoreSharer_EventMixin:
         pass
 
     def get_event_handler(self, event_type):
-        return self.staticCore.event_handlers[event_type]
+        #return self.staticCore.event_handlers['on_' + event_type]
+        return self.staticCore.get_event_handler(event_type)
+    
 
 
 class StaticCoreSharer_ClassesMixin:

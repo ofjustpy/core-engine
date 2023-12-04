@@ -1173,3 +1173,244 @@ class FooterMixin:
     html_tag = "footer"
     def __init__(self, **kwargs):
         self.domDict.html_tag = "footer"
+
+
+class TrMixin:
+    """
+    The `Tr` class corresponds to the HTML `<tr>` element. The `<tr>` element represents a table row in an HTML document.
+    """
+
+    html_tag = "tr"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "tr"
+        self.attrs = {}
+        self.htmlRender_attr = []
+        
+        for key in ["align", "bgcolor", "char", "charoff", "valign"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+        
+
+class TableMixin:
+    """
+    The `Table` class corresponds to the HTML `<table>` element. The `<table>` element represents a table in an HTML document.
+    """
+
+    html_tag = "table"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "table"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+        for key in ["border", "cellpadding", "cellspacing", "width"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+
+
+class SectionMixin:
+    """
+    The `Section` class corresponds to the HTML `<section>` element. The `<section>` element represents a generic document or application section.
+    """
+
+    html_tag = "section"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "section"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+
+
+class ArticleMixin:
+    """
+    The `Article` class corresponds to the HTML `<article>` element. The `<article>` element represents a self-contained piece of content that could be distributed and reused independently.
+    """
+
+    html_tag = "article"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "article"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+
+
+class MetaMixin:
+    """
+    The `Meta` class corresponds to the HTML `<meta>` element. The `<meta>` element provides metadata about the HTML document.
+    """
+
+    html_tag = "meta"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "meta"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+        for key in ["charset", "content", "http-equiv", "name"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+
+class ScriptMixin:
+    """
+    The `Script` class corresponds to the HTML `<script>` element. The `<script>` element is used to embed or reference executable code, typically JavaScript.
+    """
+
+    html_tag = "script"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "script"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+        for key in ["async", "charset", "defer", "src", "type"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+
+class StyleMixin:
+    """
+    The `Style` class corresponds to the HTML `<style>` element. The `<style>` element is used to embed CSS.
+    """
+
+    html_tag = "style"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "style"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+        for key in ["type", "media", "scoped"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+
+class CaptionMixin:
+    """
+    The `Caption` class corresponds to the HTML `<caption>` element. The `<caption>` element specifies the caption (or title) of a table.
+    """
+
+    html_tag = "caption"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "caption"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+        # Caption does not have specific attributes in HTML5, but you can add any custom ones if needed
+                
+
+class ColgroupMixin:
+    """
+    The `Colgroup` class corresponds to the HTML `<colgroup>` element. The `<colgroup>` element defines a group of columns in a table.
+    """
+
+    html_tag = "colgroup"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "colgroup"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+        for key in ["span"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+
+class FieldsetMixin:
+    """
+    The `Fieldset` class corresponds to the HTML `<fieldset>` element. The `<fieldset>` element is used to group related elements within a form.
+    """
+
+    html_tag = "fieldset"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "fieldset"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+        for key in ["disabled", "form", "name"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+
+class LegendMixin:
+    """
+    The `Legend` class corresponds to the HTML `<legend>` element. The `<legend>` element represents a caption for the content of its parent `<fieldset>`.
+    """
+
+    html_tag = "legend"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "legend"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+
+class OptgroupMixin:
+    """
+    The `Optgroup` class corresponds to the HTML `<optgroup>` element. The `<optgroup>` element is used to group `<option>` elements inside a `<select>` dropdown list.
+    """
+
+    html_tag = "optgroup"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "optgroup"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+        for key in ["disabled", "label"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+                
+class DlMixin:
+    """
+    The `Dl` class corresponds to the HTML `<dl>` element. The `<dl>` element represents a description list.
+    """
+
+    html_tag = "dl"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "dl"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+
+class DtMixin:
+    """
+    The `Dt` class corresponds to the HTML `<dt>` element. The `<dt>` element represents a term in a description list.
+    """
+
+    html_tag = "dt"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "dt"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
+
+class DdMixin:
+    """
+    The `Dd` class corresponds to the HTML `<dd>` element. The `<dd>` element represents the description for the corresponding term in a description list.
+    """
+
+    html_tag = "dd"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "dd"
+        self.attrs = {}
+        self.htmlRender_attr = []
+
