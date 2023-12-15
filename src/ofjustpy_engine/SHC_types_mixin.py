@@ -152,6 +152,15 @@ class StaticCore(
         TR.TwStyMixin.__init__(
             self, *args, domDict=self.domDict, attrs=self.attrs, **kwargs
         )
+        
+    @property
+    def html_tag(self):
+        return self.domDict.html_tag
+
+    @html_tag.setter
+    def html_tag(self, value):
+        self.domDict.html_tag = value
+        
 
 
 class HCCStaticMixin:

@@ -768,6 +768,15 @@ class StyleMixin:
     def __init__(self, **kwargs):
         self.domDict.html_tag = "style"
 
+        
+class StrongMixin:
+    """
+    The `Strong` class corresponds to the HTML `<strong>` element. This element is used to give strong importance to text.
+    """
+
+    def __init__(self, content=None, **kwargs):
+        self.domDict.html_tag=  "strong"
+
 
 class TdMixin:
     """
@@ -829,6 +838,52 @@ class UlMixin:
 
     def __init__(self, **kwargs):
         self.domDict.html_tag = "ul"
+
+class DetailsMixin:
+    """
+    The `DetailsMixin` class corresponds to the HTML `<details>` element.
+    The `<details>` element represents a disclosure widget from which the user can obtain additional information or controls.
+    """
+
+    html_tag = "details"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "details"
+
+        super().__init__(*args, **kwargs)
+
+        for key in ["open"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+class SummaryMixin:
+    """
+    The `SummaryMixin` class corresponds to the HTML `<summary>` element.
+    The `<summary>` element represents a summary, caption, or legend for the content of its parent `<details>` element.
+    """
+
+    html_tag = "summary"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "summary"
+
+        
+class OlMixin:
+    """
+    The `Ol` class corresponds to the HTML `<ol>` element. The `<ol>` element represents an ordered list of items.
+
+    This element is typically used to represent a list of items where the order matters, like a numbered list. It can be nested, so lists can contain sublists, both unordered (`<ul>`) and ordered (`<ol>`).
+
+    Each item in the list is marked up using a `<li>` (list item) element.
+    """
+
+    html_tag = "ol"
+
+    def __init__(self, **kwargs):
+        self.domDict.html_tag = "ol"
+
+        
 
 
 class LiMixin:
@@ -1174,7 +1229,61 @@ class FooterMixin:
     def __init__(self, **kwargs):
         self.domDict.html_tag = "footer"
 
+class HeaderMixin:
+    """ """
+    html_tag = "header"
+    def __init__(self, **kwargs):
+        self.domDict.html_tag = "header"
+        
 
+class ThMixin:
+    """
+    The `ThMixin` class corresponds to the HTML `<th>` element.
+    The `<th>` element represents a header cell in a table.
+    """
+
+    html_tag = "th"
+
+    def __init__(self,  *args, **kwargs):
+        self.domDict.html_tag = "th"
+
+class BrMixin:
+    """
+    The `BrMixin` class represents the HTML `<br>` (line break) element.
+    """
+
+    html_tag = "br"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "br"
+
+
+class TimeMixin:
+    """
+    The `TimeMixin` class represents the HTML `<time>` element.
+    The `<time>` element is used to represent a specific period in time.
+    """
+
+
+    html_tag = "time"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "time"        
+
+        
+        
+class TbodyMixin:
+    """
+    The `TbodyMixin` class corresponds to the HTML `<tbody>` element.
+    The `<tbody>` element represents the body content in a table.
+    """
+
+    html_tag = "tbody"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "tbody"
+
+        
 class TrMixin:
     """
     The `Tr` class corresponds to the HTML `<tr>` element. The `<tr>` element represents a table row in an HTML document.
@@ -1184,7 +1293,6 @@ class TrMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "tr"
-        self.attrs = {}
         self.htmlRender_attr = []
         
         for key in ["align", "bgcolor", "char", "charoff", "valign"]:
@@ -1202,15 +1310,23 @@ class TableMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "table"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
         for key in ["border", "cellpadding", "cellspacing", "width"]:
             if key in kwargs:
                 self.attrs[key] = kwargs[key]
                 self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
 
+class TheadMixin:
+    """
+    The `TheadMixin` class corresponds to the HTML `<thead>` element.
+    The `<thead>` element represents the header group in a table.
+    """
 
+    html_tag = "thead"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "thead"
+        
 
 class SectionMixin:
     """
@@ -1221,22 +1337,83 @@ class SectionMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "section"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
 
+class AsideMixin:
+    """
 
+    """
+
+    html_tag = "aside"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "aside"
+
+class AddressMixin:
+    """
+
+    """
+
+    html_tag = "address"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "address"
+        
+
+class LegendMixin:
+    """
+
+    """
+
+    html_tag = "legend"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "legend"        
+
+class SmallMixin:
+    """
+
+    """
+
+    html_tag = "small"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "small"        
+        
+        
 class ArticleMixin:
     """
-    The `Article` class corresponds to the HTML `<article>` element. The `<article>` element represents a self-contained piece of content that could be distributed and reused independently.
+    The `ArticleMixin` class corresponds to the HTML `<article>` element.
+    The `<article>` element represents a self-contained piece of content that could be distributed and reused independently, such as a news article or blog post.
     """
 
     html_tag = "article"
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "article"
-        self.attrs = {}
-        self.htmlRender_attr = []
+        
+
+class MainMixin:
+    """
+    The `Article` class corresponds to the HTML `<article>` element. The `<article>` element represents a self-contained piece of content that could be distributed and reused independently.
+    """
+
+    html_tag = "main"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "main"
+
+
+class FieldsetMixin:
+    """
+    The `FieldsetMixin` class corresponds to the HTML `<fieldset>` element. The `<fieldset>` element is used to group related elements within a form and provides a way to visually structure and organize form content.
+    """
+
+    html_tag = "fieldset"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "fieldset"
+        
 
 
 
@@ -1249,8 +1426,6 @@ class MetaMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "meta"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
         for key in ["charset", "content", "http-equiv", "name"]:
             if key in kwargs:
@@ -1267,15 +1442,31 @@ class ScriptMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "script"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
         for key in ["async", "charset", "defer", "src", "type"]:
             if key in kwargs:
                 self.attrs[key] = kwargs[key]
                 self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
 
+class BlockquoteMixin:
+    """
+    The `BlockquoteMixin` class corresponds to the HTML `<blockquote>` element. 
+    The `<blockquote>` element is used to represent a section that is quoted from another source.
+    """
 
+    html_tag = "blockquote"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "blockquote"
+
+        for key in ["cite"]:
+            if key in kwargs:
+                self.attrs[key] = kwargs[key]
+                self.htmlRender_attr.append(f'{key}="{kwargs.get(key)}"')
+
+        # Additional attributes specific to your use case can be added here
+
+        
 class StyleMixin:
     """
     The `Style` class corresponds to the HTML `<style>` element. The `<style>` element is used to embed CSS.
@@ -1285,8 +1476,6 @@ class StyleMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "style"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
         for key in ["type", "media", "scoped"]:
             if key in kwargs:
@@ -1303,8 +1492,6 @@ class CaptionMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "caption"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
         # Caption does not have specific attributes in HTML5, but you can add any custom ones if needed
                 
@@ -1318,8 +1505,6 @@ class ColgroupMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "colgroup"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
         for key in ["span"]:
             if key in kwargs:
@@ -1336,8 +1521,6 @@ class FieldsetMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "fieldset"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
         for key in ["disabled", "form", "name"]:
             if key in kwargs:
@@ -1354,8 +1537,6 @@ class LegendMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "legend"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
 
 class OptgroupMixin:
@@ -1367,13 +1548,24 @@ class OptgroupMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "optgroup"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
         for key in ["disabled", "label"]:
             if key in kwargs:
                 self.attrs[key] = kwargs[key]
                 self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+class DatalistMixin:
+    """
+    The `DatalistMixin` class corresponds to the HTML `<datalist>` element.
+    The `<datalist>` element contains a set of `<option>` elements that represent the permissible or suggested options available to users in other controls.
+    """
+
+    html_tag = "datalist"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "datalist"
+
+
 
                 
 class DlMixin:
@@ -1385,8 +1577,7 @@ class DlMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "dl"
-        self.attrs = {}
-        self.htmlRender_attr = []
+
 
 
 class DtMixin:
@@ -1398,8 +1589,6 @@ class DtMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "dt"
-        self.attrs = {}
-        self.htmlRender_attr = []
 
 
 class DdMixin:
@@ -1411,6 +1600,5 @@ class DdMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "dd"
-        self.attrs = {}
-        self.htmlRender_attr = []
+
 

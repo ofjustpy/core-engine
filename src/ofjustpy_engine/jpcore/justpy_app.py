@@ -1,7 +1,7 @@
 """
 Created on 2022-09-02
 
-@author: wf
+@author: wf, kabirak
 """
 import asyncio
 import fnmatch
@@ -64,6 +64,14 @@ lib_dir = os.path.join(template_dir, "js", jpconfig.FRONTEND_ENGINE_TYPE)
 jpconfig.FRONTEND_ENGINE_LIBS = [
     fn[:-3] for fn in os.listdir(lib_dir) if fnmatch.fnmatch(fn, "*.js")
 ]
+
+print("chasing frontend_engine_config ",
+      
+      lib_dir, " ", 
+      jpconfig.FRONTEND_ENGINE_LIBS, " ", 
+      
+      )
+
 TEMPLATES_DIRECTORY = JpConfig.config(
     "TEMPLATES_DIRECTORY", cast=str, default=template_dir
 )
