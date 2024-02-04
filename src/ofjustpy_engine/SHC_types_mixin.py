@@ -32,6 +32,8 @@ class StaticJsonMixin:
 
         self.obj_json = f"""{{ {domDict_json},  "attrs":{{ {attrs_json} }}, "object_props":{object_props_json} }}"""
 
+        
+
     def convert_object_to_json(self, parent_hidden=False):
          return self.obj_json
 
@@ -163,11 +165,11 @@ class StaticCore(
         
 
 
-class HCCStaticMixin:
-    def __init__(self, **kwargs):
-        # active childs are not added via stub-callable route
-        # the target is directly added
-        self.components = kwargs.get("childs", [])
+# class HCCStaticMixin:
+#     def __init__(self, **kwargs):
+#         # active childs are not added via stub-callable route
+#         # the target is directly added
+#         self.components = kwargs.get("childs", [])
 
 
 # class HCCMixin:

@@ -283,7 +283,12 @@ class DivMutable_JsonMixin(MutableShell_JsonMixin, JsonMixin_Base):
             object_props_json = "[]"
         else:
             object_props_json = self.get_obj_props_json(parent_hidden=is_hidden)
-        self.obj_json = f"""{{ {self.core_domDict_json}, {self.local_domDict_json}, "attrs":{{ {self.local_attrs_json} {sep} {self.core_attrs_json}   }}, "object_props": {object_props_json} }}"""
+
+        local_sep = ""
+        if self.core_domDict_json != "" and self.local_domDict_json != "":
+            local_sep = ","
+            
+        self.obj_json = f"""{{ {self.core_domDict_json}{local_sep}{self.local_domDict_json}, "attrs":{{ {self.local_attrs_json} {sep} {self.core_attrs_json}   }}, "object_props": {object_props_json} }}"""
         return self.obj_json
 
     def get_obj_props_changed_diff_patch(self, parent_hidden=False):
@@ -299,6 +304,8 @@ class DivMutable_JsonMixin(MutableShell_JsonMixin, JsonMixin_Base):
 
 
 class CoreChildMixin:
+    attr_tracked_keys = []
+    domDict_tracked_keys = []
     def __init__(self, *args, **kwargs):
         self.childs = kwargs.get("childs", [])
 
@@ -453,6 +460,8 @@ class StaticCoreSharer_ClassesMixin:
 
 
 class StaticCoreSharer_IdMixin:
+    attr_tracked_keys = []
+    domDict_tracked_keys = []
     def __init__(self, *args, **kwargs):
         pass
 

@@ -28,9 +28,14 @@ def classTypeGen(
     hctag_mixin=TR.DivMixin,
     static_core_mixins=[],
     mutable_shell_mixins=[],
-    is_childs_mutable=True,
+        mutable_shell_json_mixin= None, 
+        is_childs_mutable=True,
     is_self_mutable=False,
 ):
+    """
+    mutable_shell_json_mixin: this argument has been added
+    to configure gen Div Types from page_style_editor
+    """
     assert is_childs_mutable or is_self_mutable
 
     if is_self_mutable:
@@ -40,7 +45,6 @@ def classTypeGen(
             TR.jpBaseComponentMixin,
             TR.EventMixin,
             StaticCore_JsonMixin,
-            CoreChildMixin,
             hctag_mixin,
         ]
         shell_mixins = [
@@ -58,15 +62,16 @@ def classTypeGen(
             TR.TwStyMixin,
             TR.PassiveKeyMixin,
             StaticCore_JsonMixin,
-            CoreChildMixin,
+            #CoreChildMixin,
             hctag_mixin,
             Prepare_HtmlRenderMixin
         ]
 
         shell_mixins = []
-        static_core_sharer = (StaticCoreSharer_BaseMixin, StaticCoreSharer_IdMixin, StaticCoreSharer_ClassesMixin)
+        static_core_sharer = (StaticCoreSharer_BaseMixin, StaticCoreSharer_ClassesMixin)
 
     if is_childs_mutable:
+        core_mixins.append(CoreChildMixin)
         shell_mixins.append(HCCMixin_MutableChilds)
         shell_mixins.append(RenderHTML_HCCMutableChildsMixin)
 
@@ -74,17 +79,20 @@ def classTypeGen(
         core_mixins.append(HCCMixin_StaticChilds)
         static_core_sharer.append(StaticCoreSharer_HCCStaticMixin)
         shell_mixins.append(RenderHTML_HCCStaticChildsMixin)
-
-    match is_self_mutable, is_childs_mutable:
-        case False, True:
-            shell_mixins.append(HCCMutable_JsonMixin)
-            pass
-        case True, True:
-            shell_mixins.append(DivMutable_JsonMixin)
-        case True, False:
-            shell_mixins.append(HCCStatic_JsonMixin)
-        case _:
-            assert False
+        
+    if mutable_shell_json_mixin == None:
+        match is_self_mutable, is_childs_mutable:
+            case False, True:
+                shell_mixins.append(HCCMutable_JsonMixin)
+                pass
+            case True, True:
+                shell_mixins.append(DivMutable_JsonMixin)
+            case True, False:
+                shell_mixins.append(HCCStatic_JsonMixin)
+            case _:
+                assert False
+    else:
+        shell_mixins.append(mutable_shell_json_mixin)
 
     attr_tracked_keys = []
     domDict_tracked_keys = []
@@ -108,7 +116,6 @@ def classTypeGen(
 
             for _ in static_core_mixins:
                 _.__init__(self, *args, **kwargs)
-
 
         def post_id_assign_callback(self):
             self.prepare_htmlRender()

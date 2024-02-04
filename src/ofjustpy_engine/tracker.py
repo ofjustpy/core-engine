@@ -53,18 +53,16 @@ class SessionManager:
         self.request = request
         # cache (see below) populates the activ_connections with page_ids
         self.active_pages = set()
-
-
         # all the tw directives used by app's webpages
         self.all_twsty = set()
         
         
         # all pages that belong to this session_manager
         self.pages = set()
+        
 
     def track_stub(self, func, *args, **kwargs):
         stub = func(*args, **kwargs, session_manager=self)
-        print("adding to track = ", stub.id, type(stub.id)) 
         dnew(self.stubStore, stub.id, stub)
         return stub
 

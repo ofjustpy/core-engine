@@ -378,6 +378,47 @@ class CheckboxInputMixin(InputMixin):
             del self.attrs["checked"]
 
 
+class RadioInputMixin(InputMixin):
+    """
+
+    """
+
+    def __init__(self, **kwargs):
+        InputMixin.__init__(self, **kwargs)
+        self.attrs["type"] = "radio"
+
+        if "checked" in kwargs:
+            self.attrs["checked"] = kwargs.get("checked", False)
+
+        # def default_input(self, msg):
+        #     return self.before_event_handler(msg)
+
+        # if not self.no_events:
+        #     self.on("before", default_input)
+
+    # # event hook to toggle checkbox input
+    # def before_event_handler(self, msg):
+    #     if msg.event_type not in ["input", "change", "select"]:
+    #         return
+
+    #     self.domDict.attrs.checked = msg.checked
+
+    @property
+    def checked(self):
+        """
+        The 'checked' attribute of the <input> element with type "checkbox" specifies whether the checkbox is initially
+        checked (True) or unchecked (False). The value is a boolean.
+        """
+        return self.attrs.get("checked", None)
+
+    @checked.setter
+    def checked(self, value):
+        if value is not None:
+            self.attrs["checked"] = value
+        elif "checked" in self.attrs:
+            del self.attrs["checked"]
+            
+
 class TextareaMixin(InputMixin):
     """
     The Textarea class represents the HTML <textarea> element, which is used to create a multiline text input field

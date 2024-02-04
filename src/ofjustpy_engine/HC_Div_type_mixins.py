@@ -8,7 +8,7 @@ from py_tailwind_utils import conc_twtags
 from py_tailwind_utils import dget
 from py_tailwind_utils import remove_from_twtag_list
 from py_tailwind_utils import tstr
-
+from py_tailwind_utils.to_twsty_expr import encode_twstr
 from .HC_type_mixins_extn import *
 from .tailwind_svelte_component_mixins import *
 
@@ -332,30 +332,37 @@ class TwStyMixin:
     # override this. 
 
     def __init__(self, *args, **kwargs):
-        self.twsty_tags = kwargs.get("twsty_tags", [])
-        if not self.twsty_tags:
-            self.domDict.classes = ""
+        self.extra_classes = kwargs.get('extra_classes', "")
+        if 'classes' in kwargs:
+            assert 'twtags_tags' not in kwargs
+            self.domDict.classes = kwargs.get('classes') + " " + self.extra_classes
+            self.twsty_tags = encode_twstr(kwargs.get('classes'))
+            
+        elif 'twsty_tags' in kwargs:
+            self.twsty_tags = kwargs.get("twsty_tags")
+            if not self.twsty_tags:
+                self.domDict.classes = "" + " " + self.extra_classes
+            else:
+                self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes
         else:
-            self.domDict.classes = tstr(*self.twsty_tags)
-
-        self.htmlRender_attr.insert(0, f'''class="{self.classes}"''')
+            self.twsty_tags = []
+            self.domDict.classes = "" + " " + self.extra_classes
+        self.htmlRender_attr.insert(0, f'''class="{self.classes} {self.extra_classes}"''')
         if "style" in kwargs:
             self.attrs["style"] = kwargs.get("style")
         if self.style:
             self.htmlRender_attr.append(f'''style="{self.style}"''')
 
-        
-
     def remove_twsty_tags(self, *args):
         for _ in args:
             remove_from_twtag_list(self.twsty_tags, _)
-        self.domDict.classes = tstr(*self.twsty_tags)
-        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
+        self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes
+        self.htmlRender_attr[0] =  f'''class="{self.classes} {self.extra_classes}"'''
 
     def add_twsty_tags(self, *args):
         self.twsty_tags = conc_twtags(*self.twsty_tags, *args)
-        self.domDict.classes = tstr(*self.twsty_tags)  # change the domDict directly
-        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
+        self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes  # change the domDict directly
+        self.htmlRender_attr[0] =  f'''class="{self.classes} {self.extra_classes}"'''
         # prepare_htmlRender: applies only for active/passive and staticCore components
         # for mutable components to_html assembles htmlRender on every call
         self.prepare_htmlRender()
@@ -365,8 +372,8 @@ class TwStyMixin:
         replace the existing twsty_tags with ones in *args
         """
         self.twsty_tags = args
-        self.domDict.classes = tstr(*self.twsty_tags)  # change the domDict directly
-        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
+        self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes # change the domDict directly
+        self.htmlRender_attr[0] =  f'''class="{self.classes} {self.extra_classes}"'''
         self.prepare_htmlRender()
         pass
 
@@ -615,6 +622,7 @@ class EventMixin(EventMixinBase):
         "dragover",
         "drop",
         "click__out",
+        "dblclick"
     ]
 
     def __init__(self, *args, **kwargs):
