@@ -274,6 +274,7 @@ class ActiveDiv_RenderHTMLMixin:
         self.build_renderHtml()
     def to_html_iter(self):
         yield self.htmlRender_open_tag
+        yield from self.htmlRender_body
         for achild in self.components:
             yield from achild.to_html_iter()
         yield self.htmlRender_close_tag
@@ -327,6 +328,7 @@ class PassiveDiv_RenderHTMLMixin:
 
     def to_html_iter(self):
         yield self.htmlRender_open_tag
+        yield from self.htmlRender_body
         for achild in self.components:
             yield from achild.to_html_iter()
         yield self.htmlRender_close_tag
