@@ -28,6 +28,7 @@ from starlette.responses import JSONResponse
 from starlette.responses import PlainTextResponse
 from starlette.responses import Response
 from starlette.staticfiles import StaticFiles
+from starlette.middleware.sessions import SessionMiddleware
 from oj_signing_middleware import SerializedSignedCookieMiddleware
 
 
@@ -86,8 +87,10 @@ def build_app(
             cookie_state_attr_names.append(cookie_cfg["state_attr_name"])
     # @TODO
     # implement https://github.com/justpy-org/justpy/issues/535
-    # if SESSIONS:
-    #    middleware.append(Middleware(SessionMiddleware, secret_key=SECRET_KEY))
+
+    if jpconfig.SESSIONS:
+       middlewares.append(Middleware(SessionMiddleware, session_cookie = jpconfig.SESSION_COOKIE_NAME,
+                                     secret_key=jpconfig.SECRET_KEY))
     app = APPCLASS(
         middleware=middlewares,
         debug=jpconfig.DEBUG,
@@ -151,6 +154,7 @@ def build_app(
             Method to accept and act on data received from websocket
             """
             logging.debug("%s %s", f"Socket {websocket.id} data received:", data)
+            
             data_dict = json.loads(data)
             msg_type = data_dict["type"]
             # data_dict['event_data']['type'] = msg_type
@@ -177,7 +181,7 @@ def build_app(
                 # Message sent when an event occurs in the browser
                 session_cookie = websocket.cookies.get(jpconfig.SESSION_COOKIE_NAME)
                 if jpconfig.SESSIONS and session_cookie:
-                    session_id = cookie_signer.unsign(session_cookie).decode("utf-8")
+                    session_id = websocket.session["session_id"] 
                     data_dict["event_data"]["session_id"] = session_id
                 # await self._event(data_dict)
                 data_dict["event_data"]["msg_type"] = msg_type
@@ -196,7 +200,7 @@ def build_app(
                 # Message sent when an event occurs in the browser
                 session_cookie = websocket.cookies.get(jpconfig.SESSION_COOKIE_NAME)
                 if jpconfig.SESSIONS and session_cookie:
-                    session_id = cookie_signer.unsign(session_cookie).decode("utf-8")
+                    session_id = websocket.session["session_id"] 
                     data_dict["event_data"]["session_id"] = session_id
                 data_dict["event_data"]["msg_type"] = msg_type
                 # ====================================================

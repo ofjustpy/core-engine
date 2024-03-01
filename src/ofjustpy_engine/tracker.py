@@ -4,7 +4,8 @@ import os
 if os:
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
-
+    
+import uuid
 import json
 import logging
 import os
@@ -49,7 +50,7 @@ class SessionManager:
         self.stubStore = Dict(track_changes=True)
         self.appstate = Dict(track_changes=True)
 
-        self.session_id = request.session_id
+        self.session_id = request.session["session_id"]
         self.request = request
         # cache (see below) populates the activ_connections with page_ids
         self.active_pages = set()
@@ -106,10 +107,18 @@ class SessionManager:
 
 def get_session_manager(request):
     global session_manager_store
-    if request.session_id in session_manager_store:
-        return session_manager_store[request.session_id]
+    if "session_id" in request.session:
+        # session_id is already assigned in previsou
+        session_id = request.session["session_id"]
+    else:
+        # assign a new id; will be materialized on browser
+        request.session["session_id"] = str(uuid.uuid4().hex)
+        
+        
+    if request.session["session_id"] in session_manager_store:
+        return session_manager_store[request.session["session_id"]]
     session_manager = SessionManager(request)
-    session_manager_store[request.session_id] = session_manager
+    session_manager_store[request.session["session_id"]] = session_manager
 
     return session_manager
 
@@ -181,20 +190,24 @@ def webpage_cache(key):
             request = args[0]
             # if the session_id is scheduled for removal then cancel it.
 
-            cache_key = (request.session_id, key)
-            if cache_key in wp_endpoint_cache:
-                logging.info(f"================> returning from cache {cache_key}")
-                logging.debug(f"================> returning from cache {cache_key}")
-                wp = wp_endpoint_cache[cache_key]
-                wp.is_active = True
-                wp.is_cached = True
+            if 'session_id' in request.session:
+                cache_key = (request.session['session_id'], key)
+                if cache_key in wp_endpoint_cache:
+                    logging.info(f"================> returning from cache {cache_key}")
+                    logging.debug(f"================> returning from cache {cache_key}")
+                    wp = wp_endpoint_cache[cache_key]
+                    wp.is_active = True
+                    wp.is_cached = True
 
-                wp.session_manager.active_pages.add(wp.page_id)
-                # register the page with session manager
-                wp.session_manager.pages.add(wp)
-                return wp_endpoint_cache[cache_key]
+                    wp.session_manager.active_pages.add(wp.page_id)
+                    # register the page with session manager
+                    wp.session_manager.pages.add(wp)
+                    return wp_endpoint_cache[cache_key]
+
+            # get_session_manager is called: wp and session_id is active now. 
             wp = func(*args, **kwargs)
 
+            cache_key = (request.session['session_id'], key)
             logging.info(
                 f"================> not in cache: create a new page: {cache_key}"
             )

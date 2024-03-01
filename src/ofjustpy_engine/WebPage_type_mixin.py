@@ -32,7 +32,7 @@ class WebPageMixin:
         self.session_manager = kwargs.get("session_manager")
         assert self.session_manager is not None
         self.page_id = (
-            self.session_manager.request.session_id + ":" + self.staticCore.id
+            self.session_manager.session_id + ":" + self.staticCore.id
         )
         self.display_url = ''
         self.redirect = ''

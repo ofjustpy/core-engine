@@ -61,7 +61,7 @@ class JpConfig(Config):
             jpconfig.MEMORY_DEBUG = config("MEMORY_DEBUG", cast=bool, default=False)
             jpconfig.SESSIONS = config("SESSIONS", cast=bool, default=True)
             jpconfig.SESSION_COOKIE_NAME = config(
-                "SESSION_COOKIE_NAME", cast=str, default="jp_token"
+                "SESSION_COOKIE_NAME", cast=str, default="session"
             )
             jpconfig.SECRET_KEY = config(
                 "SECRET_KEY", default="$$$my_secret_string$$$"
@@ -98,7 +98,6 @@ class JpConfig(Config):
             jpconfig.USE_COOKIE_MIDDLEWARE = config(
                 "USE_COOKIE_MIDDLEWARE", cast=bool, default=True
             )
-            print("USE_COOKIE_MID = ", jpconfig.USE_COOKIE_MIDDLEWARE)
 
 
 JpConfig.setup()

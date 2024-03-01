@@ -343,18 +343,20 @@ def staticClassTypeGen(
     attach_event_handling=False,
     http_request_callback_mixin=HTTPRequestCallbackMixin,
     addon_mixins=[],
-    **kwargs,
+    **rwargs,
 ):
-    def constructor(self, *args, **kwargs):
+    # TODO: make_container_local is not necessary -- used for debug
+    
+
+    def constructor(self, *args,  make_container_local=make_container, **kwargs):
         self.htmlRender_attr = []
         self.htmlRender_body = []
         StaticCore.__init__(self, *args, **kwargs)
         tagtype.__init__(self, *args, **kwargs)
         TR.SvelteSafelistMixin.__init__(self, *args, **kwargs)
-
         
 
-        if make_container:
+        if make_container_local:
             hccMixinType.__init__(self, *args, **kwargs)
         else:
             TR.HCTextMixin.__init__(
@@ -373,7 +375,7 @@ def staticClassTypeGen(
         # JsonMixin should come after HCCMixin
         jsonMixinType.__init__(self, *args, **kwargs)
 
-        if make_container:
+        if make_container_local:
             if attach_event_handling:
                 ActiveDiv_RenderHTMLMixin.__init__(self, *args, **kwargs)
                 pass

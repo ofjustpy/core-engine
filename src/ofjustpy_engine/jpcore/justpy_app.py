@@ -14,7 +14,7 @@ import socket
 import sys
 import traceback
 import typing
-import uuid
+
 from sys import platform
 from threading import Thread
 
@@ -65,12 +65,6 @@ jpconfig.FRONTEND_ENGINE_LIBS = [
     fn[:-3] for fn in os.listdir(lib_dir) if fnmatch.fnmatch(fn, "*.js")
 ]
 
-print("chasing frontend_engine_config ",
-      
-      lib_dir, " ", 
-      jpconfig.FRONTEND_ENGINE_LIBS, " ", 
-      
-      )
 
 TEMPLATES_DIRECTORY = JpConfig.config(
     "TEMPLATES_DIRECTORY", cast=str, default=template_dir
@@ -368,11 +362,11 @@ class JustpyApp(Starlette):
                 Response: a HTMLResponse applying the justpy infrastructure
 
             """
-            new_cookie = self.handle_session_cookie(request)
+            #new_cookie = self.handle_session_cookie(request)
             
             wp = await self.get_page_for_func(request, func)
             response = wp.get_response_for_load_page(request)
-            response = self.set_cookie(request, response, wp, new_cookie)
+            #response = self.set_cookie(request, response, wp, new_cookie)
             if jpconfig.LATENCY:
                 await asyncio.sleep(jpconfig.LATENCY / 1000)
             return response
@@ -470,63 +464,67 @@ class JustpyApp(Starlette):
 
     #     return response
 
-    def handle_session_cookie(self, request) -> typing.Union[bool, Response]:
-        """
-        handle the session cookie for this request
+    # def handle_session_cookie(self, request) -> typing.Union[bool, Response]:
+    #     """
+    #     handle the session cookie for this request
 
-        Returns:
-            True if a new cookie and session has been created
-        """
-        # Handle web requests
-        session_cookie = request.cookies.get(jpconfig.SESSION_COOKIE_NAME)
-        new_cookie = None
-        if jpconfig.SESSIONS:
-            new_cookie = False
-            if session_cookie:
-                try:
-                    session_id = cookie_signer.unsign(session_cookie).decode("utf-8")
-                except:
-                    return PlainTextResponse("Bad Session")
-                request.state.session_id = session_id
-                request.session_id = session_id
-            else:
-                # Create new session_id
-                request.state.session_id = str(uuid.uuid4().hex)
-                request.session_id = request.state.session_id
-                new_cookie = True
-                logging.debug(f"New session_id created: {request.session_id}")
-        return new_cookie
+    #     Returns:
+    #         True if a new cookie and session has been created
+    #     """
+    #     # Handle web requests
+    #     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ in handle_session_cookie")
+    #     session_cookie = request.cookies.get(jpconfig.SESSION_COOKIE_NAME)
+    #     print(f"{jpconfig.SESSION_COOKIE_NAME} {session_cookie}")
+    #     new_cookie = None
+    #     if jpconfig.SESSIONS:
+    #         new_cookie = False
+    #         if session_cookie:
+    #             try:
+    #                 session_id = cookie_signer.unsign(session_cookie).decode("utf-8")
+    #             except:
+    #                 return PlainTextResponse("Bad Session")
+    #             request.state.session_id = session_id
+    #             request.session_id = session_id
+    #             print ("DELIVERING Existing COOOKIE ", request.session_id)
+    #         else:
+    #             # Create new session_id
+    #             print ("DELIVERING NEW COOOKIE ")
+    #             request.state.session_id = str(uuid.uuid4().hex)
+    #             request.session_id = request.state.session_id
+    #             new_cookie = True
+    #             logging.debug(f"New session_id created: {request.session_id}")
+    #     return new_cookie
 
-    def set_cookie(
-        self, request, response, load_page, new_cookie: typing.Union[bool, Response]
-    ):
-        """
-        set the cookie_value
+    # def set_cookie(
+    #     self, request, response, load_page, new_cookie: typing.Union[bool, Response]
+    # ):
+    #     """
+    #     set the cookie_value
 
-        Args:
-            request: the request
-            response: the response to be sent
-            load_page(WebPage): the WebPage to handle
-            new_cookie(bool|Response): True if there is a new cookie. Or Response if cookie was invalid
-        """
-        if isinstance(new_cookie, Response):
-            #print("returning without cookie setting")
-            return new_cookie
+    #     Args:
+    #         request: the request
+    #         response: the response to be sent
+    #         load_page(WebPage): the WebPage to handle
+    #         new_cookie(bool|Response): True if there is a new cookie. Or Response if cookie was invalid
+    #     """
+    #     if isinstance(new_cookie, Response):
+    #         #print("returning without cookie setting")
+    #         return new_cookie
 
-        if jpconfig.SESSIONS and new_cookie:
-            cookie_value = cookie_signer.sign(request.state.session_id)
-            cookie_value = cookie_value.decode("utf-8")
-            response.set_cookie(
-                jpconfig.SESSION_COOKIE_NAME,
-                cookie_value,
-                max_age=jpconfig.COOKIE_MAX_AGE,
-                httponly=True,
-            )
-            logging.debug(
-                f"set signed cookie name={jpconfig.SESSION_COOKIE_NAME} in response object"
-            )
+    #     if jpconfig.SESSIONS and new_cookie:
+    #         cookie_value = cookie_signer.sign(request.state.session_id)
+    #         cookie_value = cookie_value.decode("utf-8")
+    #         response.set_cookie(
+    #             jpconfig.SESSION_COOKIE_NAME,
+    #             cookie_value,
+    #             max_age=jpconfig.COOKIE_MAX_AGE,
+    #             httponly=True,
+    #         )
+    #         logging.debug(
+    #             f"set signed cookie name={jpconfig.SESSION_COOKIE_NAME} in response object"
+    #         )
 
-        return response
+    #     return response
 
 
 class JustpyAjaxEndpoint(HTTPEndpoint):
