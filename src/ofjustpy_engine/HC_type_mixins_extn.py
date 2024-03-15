@@ -3,6 +3,7 @@ Mixins to express all types of html components: Span, label, Ul, etc.
 """
 
 
+        
 class LabelMixin:
     """
     The Label class represents the HTML <label> element, which is used to associate a label with a form control, such as
@@ -67,6 +68,7 @@ class PMixin:
         self.domDict.html_tag = PMixin.html_tag
 
 
+            
 class ButtonMixin:
     """
     Represents an HTML <button> element, which is used to create a clickable button.
@@ -1642,4 +1644,113 @@ class DdMixin:
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "dd"
 
+# svelte-fontawesome doesn't support beat-fade, etc.
 
+
+class FontAwesomeIconMixin:
+    def __init__(self, **kwargs):
+        self.domDict.vue_type= "fontawesome_component"
+        self.domDict.html_tag = "svg"
+        self.domDict["icon_label"] = kwargs.get("label")
+        
+        
+        for key in ["size",
+                    "pulse",
+                    "flip",
+                    "rotation",
+                    "fixedWidth",
+                    "transform",
+                    "inverse",
+                    "beat",
+                    ]:
+            if key in kwargs:
+                self.attrs[key] = kwargs.get(key)
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+
+        if "beatfade" in kwargs:
+            self.attrs["beat-fade"] = kwargs.get("beatfade")
+            
+
+    @property
+    def size(self):
+        """
+        The 'size' attribute of the <button> element specifies the size of the button.
+        """
+        return self.attrs.get("size", None)
+
+    @size.setter
+    def size(self, value):
+        if value is not None:
+            self.attrs["size"] = value
+        elif "size" in self.attrs:
+            del self.attrs["size"]
+
+    @property
+    def pulse(self):
+        """
+        The 'pulse' attribute of the <button> element specifies whether the button should pulse.
+        Possible values: True or False.
+        """
+        return self.attrs.get("pulse", None)
+
+    @pulse.setter
+    def pulse(self, value):
+        if value is not None:
+            self.attrs["pulse"] = value
+        elif "pulse" in self.attrs:
+            del self.attrs["pulse"]
+
+    @property
+    def flip(self):
+        return self.attrs.get("flip", None)
+
+    @flip.setter
+    def flip(self, value):
+        if value is not None:
+            self.attrs["flip"] = value
+        elif "flip" in self.attrs:
+            del self.attrs["flip"]
+
+    @property
+    def rotation(self):
+        return self.attrs.get("rotation", None)
+
+    @rotation.setter
+    def rotation(self, value):
+        if value is not None:
+            self.attrs["rotation"] = value
+        elif "rotation" in self.attrs:
+            del self.attrs["rotation"]
+
+    @property
+    def fixedWidth(self):
+        return self.attrs.get("fixedWidth", None)
+
+    @fixedWidth.setter
+    def fixedWidth(self, value):
+        if value is not None:
+            self.attrs["fixedWidth"] = value
+        elif "fixedWidth" in self.attrs:
+            del self.attrs["fixedWidth"]
+
+    @property
+    def transform(self):
+        return self.attrs.get("transform", None)
+
+    @transform.setter
+    def transform(self, value):
+        if value is not None:
+            self.attrs["transform"] = value
+        elif "transform" in self.attrs:
+            del self.attrs["transform"]
+
+    @property
+    def inverse(self):
+        return self.attrs.get("inverse", None)
+
+    @inverse.setter
+    def inverse(self, value):
+        if value is not None:
+            self.attrs["inverse"] = value
+        elif "inverse" in self.attrs:
+            del self.attrs["inverse"]

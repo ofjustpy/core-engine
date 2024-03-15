@@ -132,7 +132,7 @@ class DataValidators:
 
 
 class StaticCore(
-    TR.jpBaseComponentMixin,
+        # TR.jpBaseComponentMixin,
     TR.TwStyMixin,
     TR.DOMEdgeMixin,
 ):
@@ -145,9 +145,9 @@ class StaticCore(
     def __init__(self, *args, **kwargs):
         self.domDict = Dict()
         self.attrs = Dict()
-        TR.jpBaseComponentMixin.__init__(
-            self, domDict=self.domDict, attrs=self.attrs, **kwargs
-        )
+        # TR.jpBaseComponentMixin.__init__(
+        #     self, domDict=self.domDict, attrs=self.attrs, **kwargs
+        # )
         TR.DOMEdgeMixin.__init__(
             self, *args, domDict=self.domDict, attrs=self.attrs, **kwargs
         )
@@ -339,19 +339,27 @@ def staticClassTypeGen(
     tagtype=TR.LabelMixin,
     hccMixinType=HCCPassiveMixin,
     jsonMixinType=PassiveJsonMixin,
+    baseComponentMixinType = TR.jpBaseComponentMixin,
     make_container=False,
     attach_event_handling=False,
     http_request_callback_mixin=HTTPRequestCallbackMixin,
     addon_mixins=[],
     **rwargs,
 ):
+    """
+    baseMixinType: by default use jpBaseComponentMixin which will set vue_type to html_component.
+    if using fontawesome_component then use special baseMixinType
+    """
     # TODO: make_container_local is not necessary -- used for debug
     
 
     def constructor(self, *args,  make_container_local=make_container, **kwargs):
         self.htmlRender_attr = []
         self.htmlRender_body = []
+
+        # allocate/initalize self.domDict, self.attrs
         StaticCore.__init__(self, *args, **kwargs)
+        baseComponentMixinType.__init__(self, *args, **kwargs)
         tagtype.__init__(self, *args, **kwargs)
         TR.SvelteSafelistMixin.__init__(self, *args, **kwargs)
         
@@ -392,11 +400,12 @@ def staticClassTypeGen(
         for _ in addon_mixins:
             _.__init__(self, *args, **kwargs)
             
-    base_types = (StaticCore, tagtype, TR.SvelteSafelistMixin)
+    base_types = (StaticCore, baseComponentMixinType, tagtype, TR.SvelteSafelistMixin)
     if make_container:
         if attach_event_handling:
             base_types = (
                 StaticCore,
+                baseComponentMixinType,
                 jsonMixinType,
                 tagtype,
                 TR.SvelteSafelistMixin,
@@ -411,6 +420,7 @@ def staticClassTypeGen(
 
         else:
             base_types = (StaticCore,
+                          baseComponentMixinType,
                           TR.SvelteSafelistMixin,
                           TR.PassiveKeyMixin,
                           jsonMixinType,
@@ -422,6 +432,7 @@ def staticClassTypeGen(
         if attach_event_handling:
             base_types = (
                 StaticCore,
+                baseComponentMixinType,
                 TR.SvelteSafelistMixin,
                 jsonMixinType,
                 tagtype,
@@ -435,6 +446,7 @@ def staticClassTypeGen(
             )
         else:
             base_types = (StaticCore,
+                          baseComponentMixinType,
                           TR.SvelteSafelistMixin,
                           TR.PassiveKeyMixin,
                           jsonMixinType,
