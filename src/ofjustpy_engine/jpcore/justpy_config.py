@@ -99,5 +99,11 @@ class JpConfig(Config):
                 "USE_COOKIE_MIDDLEWARE", cast=bool, default=True
             )
 
+            jpconfig.USE_SVELTE_SKELETON = config(
+                "USE_SVELTE_SKELETON", cast=bool, default=True
+            )
+
+            
+
 
 JpConfig.setup()

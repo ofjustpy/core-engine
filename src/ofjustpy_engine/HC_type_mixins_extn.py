@@ -18,9 +18,14 @@ class LabelMixin:
         # self.attrs = kwargs.get("attrs")
         self.domDict.html_tag = "label"
         self.domDict.class_name = "Label"
-        for attr in ["for", "form"]:
+        
+        if "for_"  in kwargs:
+            self.attrs["for"] = kwargs[attr]
+            self.htmlRender_attr.append(f'''for="{kwargs.get(attr)}"''')
+        for attr in ["form"]:
             if attr in kwargs:
-                self.attrs[attr] = kwargs[attr]
+                self.attrs["for"] = kwargs[attr]
+                key = att
                 self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
 
     @property

@@ -90,6 +90,9 @@ class jpBaseComponentMixin:
         self.domDict.debug = kwargs.get("debug", False)
         self.domDict.events = []
 
+        if "inner_html" in kwargs:
+            self.domDict["inner_html"] = kwargs.get("inner_html")
+            self.htmlRender_body.append(self.domDict["inner_html"])
         pass
 
     @property
@@ -377,6 +380,18 @@ class TwStyMixin:
         self.prepare_htmlRender()
         pass
 
+    def update_extra_classes(self, extra_classes):
+        """
+        directly change the extra_classes.
+        
+        
+        """
+        self.extra_classes = extra_classes
+        self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes # change the domDict directly
+        self.htmlRender_attr[0] =  f'''class="{self.classes} {self.extra_classes}"'''
+        self.prepare_htmlRender()
+        
+        pass
     @property
     def style(self):
         return self.attrs.get("style", None)

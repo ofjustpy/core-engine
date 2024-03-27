@@ -25,6 +25,9 @@ class StaticJsonMixin:
     def get_obj_props_json(self):
         return "[]"
 
+    def get_obj_props_jsondict(self):
+        return []
+
     def build_json(self):
         domDict_json = json.dumps(self.domDict, default=str)[1:-1]
         attrs_json = json.dumps(self.attrs, default=str)[1:-1]
@@ -32,8 +35,15 @@ class StaticJsonMixin:
 
         self.obj_json = f"""{{ {domDict_json},  "attrs":{{ {attrs_json} }}, "object_props":{object_props_json} }}"""
 
-        
 
+        
+    def convert_object_to_jsondict(self, parent_hidden=False):
+        """
+        jsondict is a dict representation that would converted to json.
+        Currently used for skeleton's slot components
+        """
+        z = {**self.domDict, "attrs": self.attrs, "object_props": self.get_obj_props_jsondict()}
+        return z
     def convert_object_to_json(self, parent_hidden=False):
          return self.obj_json
 
@@ -83,6 +93,10 @@ class HCCPassiveJsonMixin(StaticJsonMixin):
         return (
             "[" + ",".join([_.convert_object_to_json() for _ in self.components]) + "]"
         )
+    def get_obj_props_jsondict(self):
+        return (
+            [_.convert_object_to_jsondict() for _ in self.components]
+        )
 
 
 class HCCJsonMixin(StaticJsonMixin):
@@ -103,6 +117,11 @@ class HCCJsonMixin(StaticJsonMixin):
     def get_obj_props_json(self):
         return (
             "[" + ",".join([_.convert_object_to_json() for _ in self.components]) + "]"
+        )
+
+    def get_obj_props_jsondict(self):
+        return (
+            [_.convert_object_to_jsondict() for _ in self.components]
         )
 
 
@@ -344,11 +363,13 @@ def staticClassTypeGen(
     attach_event_handling=False,
     http_request_callback_mixin=HTTPRequestCallbackMixin,
     addon_mixins=[],
+        html_tag = None,
     **rwargs,
 ):
     """
     baseMixinType: by default use jpBaseComponentMixin which will set vue_type to html_component.
-    if using fontawesome_component then use special baseMixinType
+    if using fontawesome_component then use special baseMixinType,
+    html_tag: In some scenarios we pass two mixins where both have tags. 
     """
     # TODO: make_container_local is not necessary -- used for debug
     
@@ -399,7 +420,10 @@ def staticClassTypeGen(
 
         for _ in addon_mixins:
             _.__init__(self, *args, **kwargs)
-            
+
+        # explicitly fix the html_tag
+        if html_tag:
+            self.domDict.html_tag = html_tag
     base_types = (StaticCore, baseComponentMixinType, tagtype, TR.SvelteSafelistMixin)
     if make_container:
         if attach_event_handling:

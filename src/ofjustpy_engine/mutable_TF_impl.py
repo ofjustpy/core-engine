@@ -481,6 +481,9 @@ class StaticCoreSharer_IdMixin:
         
 
 class StaticCoreSharer_ValueMixin:
+    attr_tracked_keys = []
+    domDict_tracked_keys = []
+
     def __init__(self, *args, **kwargs):
         pass
 

@@ -156,6 +156,43 @@ class WebPageMixin:
 
         return self
 
+    async def run_javascript(self, javascript_string:str, *, request_id=None, send=True):
+        """
+        run the given JavaScript code remotely
+        
+        Args:
+            javascript_string(str): the javascript code to run remotely
+        """
+        try:
+            websocket_dict = AppDB.pageId_to_websockets[self.page_id]
+            # TODO: log failure points carefully
+        except:
+            return self
+        dict_to_send = {
+            "type": "run_javascript",
+            "data": javascript_string,
+            "request_id": request_id,
+            "send": send,
+        }
+                    
+        websockets = list(websocket_dict.values())
+        await asyncio.gather(
+            *[
+                websocket.send_json(dict_to_send)
+                for websocket in list(websocket_dict.values())
+            ],
+            return_exceptions=True,
+        )
+        return self
+
+    async def trigger_toast(self, msg):
+        """
+        TODO: this function should be part of skeleton_mixing
+        """
+        print("please trigger skeleton toast")
+        await self.run_javascript(f"""
+        skeleton_utilities.triggerToast("{msg}");
+        """)
     async def on_disconnect(self, websocket=None):
         self.is_active = False
         if self.is_cached == False:
