@@ -270,6 +270,7 @@ class HCTextMixin:
 
     @text.setter
     def text(self, value):
+
         if self.domDict["text"]:
             self.htmlRender_body.remove(self.domDict["text"])
         if value is not None:
@@ -347,15 +348,28 @@ class TwStyMixin:
                 self.domDict.classes = "" + " " + self.extra_classes
             else:
                 self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes
+
+            
         else:
             self.twsty_tags = []
             self.domDict.classes = "" + " " + self.extra_classes
+
+        # make sure by mistake we are not
+        # introducing wrong utility class
+
+        for uc in self.domDict.classes.split():
+            if 'm-' in uc[0:2] or 'p-' in uc[0:2]:
+                if len(uc.split("-")) > 2:
+                    assert False
+                
+            
         self.htmlRender_attr.insert(0, f'''class="{self.classes} {self.extra_classes}"''')
         if "style" in kwargs:
             self.attrs["style"] = kwargs.get("style")
         if self.style:
             self.htmlRender_attr.append(f'''style="{self.style}"''')
 
+    
     def remove_twsty_tags(self, *args):
         for _ in args:
             remove_from_twtag_list(self.twsty_tags, _)

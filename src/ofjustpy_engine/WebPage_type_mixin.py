@@ -41,13 +41,16 @@ class WebPageMixin:
         # non-http cookies ; accessible via javascript on the page
         self.css = ""
         self.head_html = kwargs.get("head_html", "")
+
         self.body_html = ""
         self.html = ""
-        self.body_style = ""
-        self.body_classes = ""
+        self.body_style = kwargs.get("body_style", "")
+        self.body_classes = kwargs.get("body_classes", "")
         self.reload_interval = None
         # rendering will depend on the webpage_type
-        # 
+        #
+        self.skeleton_data_theme = kwargs.get("skeleton_data_theme", "skeleton")
+        
         self.webpage_type = WebPageType.RESPONSIVE_STATIC
         AppDB.pageId_to_webpageInstance[self.page_id] = self
 

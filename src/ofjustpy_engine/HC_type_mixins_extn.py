@@ -2,7 +2,7 @@
 Mixins to express all types of html components: Span, label, Ul, etc.
 """
 
-
+import icons_svg
         
 class LabelMixin:
     """
@@ -20,8 +20,8 @@ class LabelMixin:
         self.domDict.class_name = "Label"
         
         if "for_"  in kwargs:
-            self.attrs["for"] = kwargs[attr]
-            self.htmlRender_attr.append(f'''for="{kwargs.get(attr)}"''')
+            self.attrs["for"] = kwargs["for_"]
+            self.htmlRender_attr.append(f'''for="{kwargs.get('for_')}"''')
         for attr in ["form"]:
             if attr in kwargs:
                 self.attrs["for"] = kwargs[attr]
@@ -898,8 +898,6 @@ class DetailsMixin:
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "details"
 
-        super().__init__(*args, **kwargs)
-
         for key in ["open"]:
             if key in kwargs:
                 self.attrs[key] = kwargs[key]
@@ -1062,7 +1060,7 @@ class H2Mixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h2"
-        super().__init__(*args, **kwargs)
+
 
 
 class H3Mixin:
@@ -1073,7 +1071,6 @@ class H3Mixin:
     html_tag = "h3"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h3"
-        super().__init__(*args, **kwargs)
 
 
 class H4Mixin:
@@ -1084,7 +1081,7 @@ class H4Mixin:
     html_tag = "h4"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h4"
-        super().__init__(*args, **kwargs)
+
 
 
 class H5Mixin:
@@ -1095,7 +1092,7 @@ class H5Mixin:
     html_tag = "h5"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h5"
-        super().__init__(*args, **kwargs)
+
 
 
 class H6Mixin:
@@ -1106,7 +1103,7 @@ class H6Mixin:
     html_tag = "h6"
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "h6"
-        super().__init__(*args, **kwargs)
+
 
 
 class FormMixin:
@@ -1654,9 +1651,13 @@ class DdMixin:
 
 class FontAwesomeIconMixin:
     def __init__(self, **kwargs):
+        """
+            fa_group : stores what group the fontawesome tag belongs
+        """
         self.domDict.vue_type= "fontawesome_component"
         self.domDict.html_tag = "svg"
         self.domDict["icon_label"] = kwargs.get("label")
+        self.domDict["fa_group"] = kwargs.get("fa_group", "solid") 
         
         
         for key in ["size",
@@ -1670,11 +1671,21 @@ class FontAwesomeIconMixin:
                     ]:
             if key in kwargs:
                 self.attrs[key] = kwargs.get(key)
-                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+                #We don't know how to get this working with SSR html render
+                #self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
 
         if "beatfade" in kwargs:
             self.attrs["beat-fade"] = kwargs.get("beatfade")
             
+        mdi_label = kwargs.get("mdi_label", None)
+
+        view_box, path_content = icons_svg.get_svg(self.domDict["icon_label"],
+                                                   self.domDict["fa_group"],
+                                                   mdi_label
+                                                   )
+        self.htmlRender_attr.append(f'''viewBox="{view_box}"''')
+        
+        self.htmlRender_body.append(path_content)
 
     @property
     def size(self):

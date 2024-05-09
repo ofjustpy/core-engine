@@ -39,6 +39,8 @@ class JsonMixin_Base:
     def get_obj_props_json(self, parent_hidden=False):
         return "[]"
 
+    def get_obj_props_jsondict(self):
+        return []
     def build_json(self, parent_hidden=False):
         self.core_attrs_json = self.staticCore.get_attrs_json()
         self.core_domDict_json = self.staticCore.get_domDict_json()
@@ -73,6 +75,22 @@ class JsonMixin_Base:
         self.domDict.clear_changed_history()
         self.attrs.clear_changed_history()
 
+    def convert_object_to_jsondict(self, parent_hidden=False):
+        """
+        jsondict is a dict representation that would converted to json.
+        Currently used for skeleton's slot components;
+        The code is untested
+        """
+        self.staticCore.attrs
+        self.staticCore.domDict
+        self.domDict
+        self.attrs
+        z = {**self.staticCore.domDict, **self.domDict,
+             "attrs": {**self.attrs, **self.staticCore.attrs},
+             "object_props": self.get_obj_props_jsondict()
+             }
+        return z
+    
     def get_obj_props_changed_diff_patch(self):
         return
         yield
@@ -266,6 +284,7 @@ class DivMutable_JsonMixin(MutableShell_JsonMixin, JsonMixin_Base):
         )
 
         return object_props_json
+
 
     def convert_object_to_json(self, parent_hidden=False):
         is_hidden = False  # "hidden" in self.classes

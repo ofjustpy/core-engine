@@ -14,7 +14,6 @@ from . import HC_Div_type_mixins as TR
         
 # ========================== all json mixins =========================
 
-
 class StaticJsonMixin:
     """Mixin for static objects that have id/event handler attached to it."""
 
@@ -44,6 +43,7 @@ class StaticJsonMixin:
         """
         z = {**self.domDict, "attrs": self.attrs, "object_props": self.get_obj_props_jsondict()}
         return z
+    
     def convert_object_to_json(self, parent_hidden=False):
          return self.obj_json
 
@@ -164,9 +164,8 @@ class StaticCore(
     def __init__(self, *args, **kwargs):
         self.domDict = Dict()
         self.attrs = Dict()
-        # TR.jpBaseComponentMixin.__init__(
-        #     self, domDict=self.domDict, attrs=self.attrs, **kwargs
-        # )
+
+
         TR.DOMEdgeMixin.__init__(
             self, *args, domDict=self.domDict, attrs=self.attrs, **kwargs
         )
@@ -218,7 +217,9 @@ class HCCStaticMixin:
 
     def __init__(self, *args, **kwargs):
         self.components = kwargs.get("childs", [])
-
+        # child_item_order is used by javascript render to render the childs in the
+        # said order
+        self.domDict["child_item_order"] = ["inner_html", "text", "childs"]
         
     def add_register_childs(self):
 

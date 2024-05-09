@@ -85,8 +85,18 @@ class Stub_HCStatic(StubTag):
 
     
     @property
+    def extra_classes(self):
+        """
+        skeleton utility classes are defined
+        in extra_classes
+        
+        """
+        return self.target.extra_classes
+
+    @property
     def twsty_tags(self):
         return self.target.twsty_tags
+    
     
     @property
     def id(self):
@@ -248,10 +258,8 @@ def gen_Stub_DivActive(target, **kwargs):
 
 def gen_Stub_HCCMutable(*args, **kwargs):
     """
-    since events are associated with the
-    components, they need to be assigned an id
     """
-    #kwargs.get("staticCore").prepare_htmlRender()
+
     return Stub_HCCMutable(*args, **kwargs
                         
                     )
@@ -284,6 +292,16 @@ class Stub_HCMutable:
     def twsty_tags(self):
         return self.kwargs.get('twsty_tags')
 
+    @property
+    def extra_classes(self):
+        """
+        skeleton utility classes are defined
+        in extra_classes
+        
+        """
+        return self.kwargs.get("staticCore").extra_classes
+
+    
     @property
     def svelte_safelist(self):
         return self.kwargs.get("staticCore").svelte_safelist
@@ -401,6 +419,11 @@ class Stub_HCCMutable:
     @property
     def twsty_tags(self):
         return self.kwargs.get("staticCore").twsty_tags
+
+    @property
+    def extra_classes(self):
+        return self.kwargs.get("staticCore").extra_classes
+    
     
     @property
     def key(self):
