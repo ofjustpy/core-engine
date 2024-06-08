@@ -1,6 +1,6 @@
+//  Used with server side rendering; 
 // Setup and manage communication between client and server
 // event communication via websockes
-// Assumes server side rendering.
 
     
 var socket = null;

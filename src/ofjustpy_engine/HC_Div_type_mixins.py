@@ -469,6 +469,7 @@ class EventMixinBase:
         pass
 
     def set_keyword_events(self, **kwargs):
+        
         for e in self.allowed_events:
             for prefix in ["", "on", "on_"]:
                 if prefix + e in kwargs.keys():
@@ -485,6 +486,7 @@ class EventMixinBase:
         throttle=None,
         immediate=False,
     ):
+        
         if event_type in self.allowed_events:
             if not self.event_prehook:
                 self.event_handlers["on_" + event_type] = func
@@ -510,7 +512,8 @@ class EventMixinBase:
         else:
             raise Exception(f"No event of type {event_type} supported")
         # events have changed: repare the htmlRenderer
-        self.prepare_htmlRender()
+        # Turning off for now -- not doing server side rendering
+        #self.prepare_htmlRender()
 
     def add_prehook(self, prehook_func):
         """

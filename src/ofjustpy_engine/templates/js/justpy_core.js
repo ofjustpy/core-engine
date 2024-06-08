@@ -1,5 +1,6 @@
 /***
- * justpy core java script
+ * used with client side rendering   
+ * justpy core java script; 
  */
 
 /**
@@ -408,10 +409,13 @@ class JustpyCore {
 		    //const config = chartInstance.config;
 		    //config.scales.x.title.text = "abctitlee";
 		}
-		if (data[id].hasOwnProperty('domDict')) {
+	      if (data[id].hasOwnProperty('domDict')) {
+		console.log("Update property for id ", id);
+		console.log(jpComponentBuilder.updateComponentTwClass);
 		    var domDict = data[id].domDict;
 		    if (domDict.hasOwnProperty('/classes')) {
-			element.className = domDict['/classes'];
+		      //element.className = domDict['/classes'];
+		      jpComponentBuilder.updateComponentTwClass(id, domDict['/classes']);
 		    }
 		    if (domDict.hasOwnProperty('/text')) {
 			element.innerText = domDict['/text'];
