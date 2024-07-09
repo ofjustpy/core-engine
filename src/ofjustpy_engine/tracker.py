@@ -111,7 +111,7 @@ def get_session_manager(request):
         # session_id is already assigned in previsou
         session_id = request.session["session_id"]
     else:
-        # assign a new id; will be materialized on browser
+        # assign a new id; the id will be materialized on browser as session cookie
         request.session["session_id"] = str(uuid.uuid4().hex)
         
         

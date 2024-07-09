@@ -79,7 +79,7 @@ class JpConfig(Config):
             jpconfig.SSL_CERTFILE = config("SSL_CERTFILE", default="")
 
             jpconfig.STATIC_DIRECTORY = config(
-                "STATIC_DIRECTORY", cast=str, default=os.getcwd()
+                "STATIC_DIRECTORY", cast=str, default="static/"
             )
             jpconfig.STATIC_ROUTE = config("STATIC_MOUNT", cast=str, default="/static")
             jpconfig.STATIC_NAME = config("STATIC_NAME", cast=str, default="static")

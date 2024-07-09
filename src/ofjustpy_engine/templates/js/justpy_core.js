@@ -245,7 +245,7 @@ class JustpyCore {
 		});
 
 	    socket.addEventListener('message', function(event) {
-		console.log('message Event listen', event);
+		//console.log('message Event listen', event);
 			this.handleMessageEvent(event);
 		}.bind(this));  // handover the class context to the event listener function
 	}
@@ -256,11 +256,11 @@ class JustpyCore {
 	 * @param event
 	 */
     handleMessageEvent(event) {
-	console.log('Message received from server ', event);
+	//console.log('Message received from server ', event);
 	msg = JSON.parse(event.data);
 	
 		// if (this.debug) {
-	console.log('Message received from server:msg ', msg);
+      //console.log('Message received from server:msg ', msg);
 
 		//}
 		switch (msg.type) {
@@ -410,11 +410,10 @@ class JustpyCore {
 		    //config.scales.x.title.text = "abctitlee";
 		}
 	      if (data[id].hasOwnProperty('domDict')) {
-		console.log("Update property for id ", id);
-		console.log(jpComponentBuilder.updateComponentTwClass);
 		    var domDict = data[id].domDict;
 		    if (domDict.hasOwnProperty('/classes')) {
 		      //element.className = domDict['/classes'];
+		      console.log("Update-classes for element with id : ", id)
 		      jpComponentBuilder.updateComponentTwClass(id, domDict['/classes']);
 		    }
 		    if (domDict.hasOwnProperty('/text')) {

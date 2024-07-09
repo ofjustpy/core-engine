@@ -8,11 +8,11 @@ var files_chosen = {};
 
 function eventHandler_CSR(props, event, form_data, aux) {
     //if (props.jp_props.debug) {
-        console.log('-------------------------');
-        console.log('In eventHandler: ' + event.type + '  ' + props.jp_props.vue_type + '  ' + props.jp_props.class_name);
-        console.log(event);
-        console.log(props.jp_props);
-        console.log('-------------------------');
+        //console.log('-------------------------');
+        //console.log('In eventHandler: ' + event.type + '  ' + props.jp_props.vue_type + '  ' + props.jp_props.class_name);
+       // console.log(event);
+        //console.log(props.jp_props);
+        //console.log('-------------------------');
 //}
     if (!websocket_ready && use_websockets) {
         setTimeout(function(){ eventHandler_CSR(props, event, form_data, aux); }, 100);

@@ -363,7 +363,7 @@ class TwStyMixin:
                     assert False
                 
             
-        self.htmlRender_attr.insert(0, f'''class="{self.classes} {self.extra_classes}"''')
+        self.htmlRender_attr.insert(0, f'''class="{self.classes}"''')
         if "style" in kwargs:
             self.attrs["style"] = kwargs.get("style")
         if self.style:
