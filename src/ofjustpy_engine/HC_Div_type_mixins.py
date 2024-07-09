@@ -352,7 +352,7 @@ class TwStyMixin:
             
         else:
             self.twsty_tags = []
-            self.domDict.classes = "" + " " + self.extra_classes
+            self.domDict.classes =  self.extra_classes
 
         # make sure by mistake we are not
         # introducing wrong utility class
@@ -379,7 +379,7 @@ class TwStyMixin:
     def add_twsty_tags(self, *args):
         self.twsty_tags = conc_twtags(*self.twsty_tags, *args)
         self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes  # change the domDict directly
-        self.htmlRender_attr[0] =  f'''class="{self.classes} {self.extra_classes}"'''
+        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
         # prepare_htmlRender: applies only for active/passive and staticCore components
         # for mutable components to_html assembles htmlRender on every call
         self.prepare_htmlRender()
@@ -390,7 +390,7 @@ class TwStyMixin:
         """
         self.twsty_tags = args
         self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes # change the domDict directly
-        self.htmlRender_attr[0] =  f'''class="{self.classes} {self.extra_classes}"'''
+        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
         self.prepare_htmlRender()
         pass
 
@@ -402,7 +402,7 @@ class TwStyMixin:
         """
         self.extra_classes = extra_classes
         self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes # change the domDict directly
-        self.htmlRender_attr[0] =  f'''class="{self.classes} {self.extra_classes}"'''
+        self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
         self.prepare_htmlRender()
         
         pass
