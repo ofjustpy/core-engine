@@ -1671,11 +1671,17 @@ class FontAwesomeIconMixin:
                     ]:
             if key in kwargs:
                 self.attrs[key] = kwargs.get(key)
+                self.htmlRender_attr.append(f'''{key}="{self.attrs[key]}"''')
                 #We don't know how to get this working with SSR html render
                 #self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
 
         if "beatfade" in kwargs:
             self.attrs["beat-fade"] = kwargs.get("beatfade")
+            self.htmlRender_attr.append(f'''beat-fade="{self.attrs["beat-fade"]}"''')
+            
+        if 'fill' in kwargs:
+            self.attrs['fill'] = kwargs.get('fill')
+            self.htmlRender_attr.append(f'''fill="{self.attrs["fill"]}"''')
             
         mdi_label = kwargs.get("mdi_label", None)
 
@@ -1684,6 +1690,11 @@ class FontAwesomeIconMixin:
                                                    mdi_label
                                                    )
         self.htmlRender_attr.append(f'''viewBox="{view_box}"''')
+        self.htmlRender_attr.append(f'''aria-hidden="true"''')
+        self.htmlRender_attr.append(f'''focusable="false"''')
+        self.htmlRender_attr.append(f'''data-prefix="fas"''')
+        self.htmlRender_attr.append(f'''role="img"''')
+        self.htmlRender_attr.append(f'''xmlns="http://www.w3.org/2000/svg"''')
         
         self.htmlRender_body.append(path_content)
 
