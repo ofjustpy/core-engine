@@ -168,7 +168,8 @@ class CommChannelHandler {
 	 * handles the page_update event
 	 */
 	handlePageUpdateEvent(msg) {
-		if (msg.page_options.redirect) {
+	  if (msg.page_options.redirect) {
+	    console.log("now redirecting page ", msg.page_options.redirect);
 			location.href = msg.page_options.redirect;
 			return;
 		}

@@ -293,6 +293,17 @@ class TextInputMixin(InputMixin):
                 self.attrs[attr] = kwargs[attr]
                 self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
 
+        if "value" in kwargs:
+            self.domDict["value"] = kwargs.get("value")
+            self.htmlRender_attr.append(f'''value="{kwargs.get("value")}"''')
+            
+    @property
+    def value(self):
+        """
+        The 'value' attribute of the <data> element specifies the machine-readable value associated with the element.
+        """
+        return self.domDict.get("value", None)
+    
     @property
     def autocomplete(self):
         return self.attrs["autocomplete"]
@@ -352,9 +363,13 @@ class CheckboxInputMixin(InputMixin):
     def __init__(self, **kwargs):
         InputMixin.__init__(self, **kwargs)
         self.attrs["type"] = "checkbox"
+        self.htmlRender_attr.append(f'type="checkbox"')
 
-        if "checked" in kwargs:
-            self.attrs["checked"] = kwargs.get("checked", False)
+
+        self.attrs["checked"] = kwargs.get("checked", False)
+        # add checked attribute only if checked
+        if self.attrs["checked"] == True: 
+            self.htmlRender_attr.append(f'''checked="{self.attrs["checked"]}"''')
 
         # def default_input(self, msg):
         #     return self.before_event_handler(msg)
@@ -377,25 +392,31 @@ class CheckboxInputMixin(InputMixin):
         """
         return self.attrs.get("checked", None)
 
+    @property
+    def value(self):
+        return self.checked
+        
     @checked.setter
     def checked(self, value):
         if value is not None:
             self.attrs["checked"] = value
         elif "checked" in self.attrs:
             del self.attrs["checked"]
+            raise ValueError("In SSR mode: deletion of attribute is not supported")
 
 
 class RadioInputMixin(InputMixin):
     """
 
     """
-
     def __init__(self, **kwargs):
         InputMixin.__init__(self, **kwargs)
         self.attrs["type"] = "radio"
+        self.htmlRender_attr.append(f'type="radio"')
 
         if "checked" in kwargs:
             self.attrs["checked"] = kwargs.get("checked", False)
+            self.htmlRender_attr.append(f'''checked="{self.attrs["checked"]}"''')
 
         # def default_input(self, msg):
         #     return self.before_event_handler(msg)
@@ -424,7 +445,7 @@ class RadioInputMixin(InputMixin):
             self.attrs["checked"] = value
         elif "checked" in self.attrs:
             del self.attrs["checked"]
-            
+            raise ValueError("In SSR mode: delete of attribute is not supported")
 
 class TextareaMixin(InputMixin):
     """
@@ -442,6 +463,18 @@ class TextareaMixin(InputMixin):
             if attr in kwargs:
                 self.attrs[attr] = kwargs[attr]
                 self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
+
+        if "value" in kwargs:
+            self.domDict["value"] = kwargs.get("value")
+            self.htmlRender_attr.append(f'''value="{kwargs.get("value")}"''')
+            
+    @property
+    def value(self):
+        """
+        The 'value' attribute of the <data> element specifies the machine-readable value associated with the element.
+        """
+        return self.domDict.get("value", None)
+    
 
     @property
     def cols(self):
@@ -607,7 +640,18 @@ class SelectInputMixin(InputMixin):
             if attr in kwargs:
                 self.attrs[attr] = kwargs[attr]
                 self.htmlRender_attr.append(f'''{attr}="{kwargs.get(attr)}"''')
-                
+
+        if "value" in kwargs:
+            self.domDict["value"] = kwargs.get("value")
+            self.htmlRender_attr.append(f'''value="{kwargs.get("value")}"''')
+            
+    @property
+    def value(self):
+        """
+        The 'value' attribute of the <data> element specifies the machine-readable value associated with the element.
+        """
+        return self.domDict.get("value", None)
+    
     @property
     def multiple(self):
         """
@@ -1672,7 +1716,7 @@ class FontAwesomeIconMixin:
             if key in kwargs:
                 self.attrs[key] = kwargs.get(key)
                 self.htmlRender_attr.append(f'''{key}="{self.attrs[key]}"''')
-                #We don't know how to get this working with SSR html render
+                #Note: In SSR rendering these won't have any effect
                 #self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
 
         if "beatfade" in kwargs:

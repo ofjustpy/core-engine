@@ -103,6 +103,30 @@ class WebPageMixin:
             return_exceptions=True,
         )
 
+    async def redirect_to_url(self, redirect_url,
+                              ):
+        """
+        send message to websocket to update the page. Currently only supports
+        page redirect
+        """
+        dict_to_send = {
+            "type": "page_update",
+            "page_options": {
+                "redirect": redirect_url,
+            },
+        }
+
+        try:
+            websocket_dict = AppDB.pageId_to_websockets[self.page_id]
+        except:
+            
+            return self
+        websockets = list(websocket_dict.values())
+        _results = await asyncio.gather(
+            *[websocket.send_json(dict_to_send) for websocket in websockets],
+            return_exceptions=True,
+        )
+        pass
     async def update(self, websocket=None):
         """
         update the Webpage
@@ -114,6 +138,7 @@ class WebPageMixin:
         try:
             websocket_dict = AppDB.pageId_to_websockets[self.page_id]
         except:
+            
             return self
 
         if self.to_json_optimized:
@@ -134,28 +159,31 @@ class WebPageMixin:
             # ========================================================
         else:
             # ============== build the dict and the json =============
-            dict_to_send = {
-                "type": "page_update",
-                "data": self.build_list(),
-                "page_options": {
-                    "display_url": self.display_url,
-                    "title": self.title,
-                    "redirect": self.redirect,
-                    "open": self.open,
-                    "favicon": self.favicon,
-                },
-            }
+            # no longer support sending entire dict and
+            # rerendering the all the components 
+            assert False
+            # dict_to_send = {
+            #     "type": "page_update",
+            #     "data": self.build_list(),
+            #     "page_options": {
+            #         "display_url": self.display_url,
+            #         "title": self.title,
+            #         "redirect": self.redirect,
+            #         "open": self.open,
+            #         "favicon": self.favicon,
+            #     },
+            # }
 
-            if websocket:
-                AppDB.loop.create_task(websocket.send_json(dict_to_send))
-            else:
-                websockets = list(websocket_dict.values())
-                _results = await asyncio.gather(
-                    *[websocket.send_json(dict_to_send) for websocket in websockets],
-                    return_exceptions=True,
-                )
-                # ======================== end =======================
-                pass
+            # if websocket:
+            #     AppDB.loop.create_task(websocket.send_json(dict_to_send))
+            # else:
+            #     websockets = list(websocket_dict.values())
+            #     _results = await asyncio.gather(
+            #         *[websocket.send_json(dict_to_send) for websocket in websockets],
+            #         return_exceptions=True,
+            #     )
+            #     # ======================== end =======================
+            #     pass
 
         return self
 
@@ -192,7 +220,7 @@ class WebPageMixin:
         """
         TODO: this function should be part of skeleton_mixing
         """
-        print("please trigger skeleton toast")
+
         await self.run_javascript(f"""
         skeleton_utilities.triggerToast("{msg}");
         """)

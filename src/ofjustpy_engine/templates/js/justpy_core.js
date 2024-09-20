@@ -322,7 +322,9 @@ class JustpyCore {
 	/**
 	 * handles the page_update event
 	 */
-	handlePageUpdateEvent(msg) {
+  handlePageUpdateEvent(msg) {
+    console.log("page update event called ");
+    console.log(msg);
 		if (msg.page_options.redirect) {
 			location.href = msg.page_options.redirect;
 			return;
@@ -330,7 +332,8 @@ class JustpyCore {
 		if (msg.page_options.open) {
 			window.open(msg.page_options.open, '_blank');
 		}
-		if (msg.page_options.display_url !== null)
+    if (msg.page_options.display_url)
+      
 			window.history.pushState("", "", msg.page_options.display_url);
 		document.title = msg.page_options.title;
 		if (msg.page_options.favicon) {
@@ -346,9 +349,12 @@ class JustpyCore {
 		}
 	        // app1 <--> App.Svelte no longer holds justpyComponents
 	    //app1.$set({justpyComponents : msg.data});
-	    // it is now exported via jpComponentBuilder.justpyComponents
-	    //jpComponentBuilder.justpyComponents.set(msg.data)
-	    jpComponentBuilder.setJustpyComponents(msg.data)
+	  // it is now exported via jpComponentBuilder.justpyComponents
+	  //jpComponentBuilder.justpyComponents.set(msg.data)
+	  // jpComponentBuilder.setJustpyComponents is no longer used
+	  // see component_generator.createApp
+	  // you cannot redraw the entire page after it has been rendered
+	  //jpComponentBuilder.setJustpyComponents(msg.data)
 	}
 
 	/**
