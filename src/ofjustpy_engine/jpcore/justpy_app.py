@@ -365,7 +365,7 @@ class JustpyApp(Starlette):
             #new_cookie = self.handle_session_cookie(request)
             
             wp = await self.get_page_for_func(request, func)
-            response = wp.get_response_for_load_page(request)
+            response = await wp.get_response_for_load_page(request)
             #response = self.set_cookie(request, response, wp, new_cookie)
             if jpconfig.LATENCY:
                 await asyncio.sleep(jpconfig.LATENCY / 1000)

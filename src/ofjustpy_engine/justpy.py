@@ -61,7 +61,13 @@ def build_app(
             },
         }
     ],
+        
+        middlewares_suffix = None,
+        **kwargs
 ):
+    """
+    middlewares_suffix: Put cors middleware here. It is required that CORS is the last middleware, otherwise won't work. See https://github.com/fastapi/fastapi/issues/1663
+    """
     if not middlewares:
         middlewares = []
     # middlewares.append(Middleware(GZipMiddleware))
@@ -91,10 +97,18 @@ def build_app(
     if jpconfig.SESSIONS:
        middlewares.append(Middleware(SessionMiddleware, session_cookie = jpconfig.SESSION_COOKIE_NAME,
                                      secret_key=jpconfig.SECRET_KEY))
+
+
+
+    if middlewares_suffix:
+        middlewares.extend(middlewares_suffix)
+
+    print("++++----- ", middlewares)
     app = APPCLASS(
         middleware=middlewares,
         debug=jpconfig.DEBUG,
         cookie_state_attr_names=cookie_state_attr_names,
+        **kwargs
     )
     assert app is not None
     app.mount(
@@ -114,6 +128,7 @@ def build_app(
         # WebPage.loop = asyncio.get_event_loop()
         # TBFixed: we need to eventully move to datastore.loop
         # WebPageStaticBase.loop = asyncio.get_event_loop()
+        print("#%#%#%#%#%#%#%%%% HALLA justpy_startup invoked")
         AppDB.loop = asyncio.get_event_loop()
 
         if startup_func:

@@ -103,6 +103,27 @@ class JpConfig(Config):
                 "USE_SVELTE_SKELETON", cast=bool, default=True
             )
 
+            # AUTH/SQLAlchemy related config var and values
+            jpconfig.SQLALCHEMY_DB_CONNECTION_URL = config("SQLALCHEMY_DB_CONNECTION_URL",
+                                                          cast =str,
+                                                          default = "sqlite+pysqlite:///:memory:"
+                                                          )
+            jpconfig.SQLALCHEMY_BASENAME = config("SQLALCHEMY_BASENAME",
+                                                          cast =str,
+                                                          default = "Base"
+                                                          )
+            
+            jpconfig.SQLALCHEMY_DBMODELS_PYMODULE_NAME = config("AUTH_DBMODELS_PYMODULE_NAME",
+                                                          cast =str,
+                                                          default = "dbmodels"
+                                                          )
+            jpconfig.AUTH_USER_MODEL = config("AUTH_USER_MODEL",
+                                                          cast =str,
+                                                          default = "dbusers"
+                                                          )
+
+
+            # 
             
 
 

@@ -42,7 +42,7 @@ class WebPageMixin:
         self.css = ""
         self.head_html = kwargs.get("head_html", "")
 
-        self.body_html = ""
+        self.body_html = kwargs.get("body_html", "")
         self.html = ""
         self.body_style = kwargs.get("body_style", "")
         self.body_classes = kwargs.get("body_classes", "")

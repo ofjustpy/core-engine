@@ -280,7 +280,8 @@ class InputMixin:
 class TextInputMixin(InputMixin):
     def __init__(self, *args, **kwargs):
         InputMixin.__init__(self, *args, **kwargs)
-        self.attrs["type"] = "text"
+        self.attrs["type"] = kwargs.get("type", "text")
+        self.htmlRender_attr.append(f'''type="{self.attrs["type"]}"''')
         for attr in [
             "autocomplete",
             "maxlength",
