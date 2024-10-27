@@ -491,6 +491,7 @@ class EventMixinBase:
             if not self.event_prehook:
                 self.event_handlers["on_" + event_type] = func
             else:
+                print(f"self.event_prehook attached to {func}")
                 self.event_handlers["on_" + event_type] = self.event_prehook(func)
                 pass
 

@@ -1826,3 +1826,88 @@ class FontAwesomeIconMixin:
             self.attrs["inverse"] = value
         elif "inverse" in self.attrs:
             del self.attrs["inverse"]
+
+
+class IframeMixin:
+    """
+    Represents an HTML <iframe> element, used to embed another document within the current HTML document.
+    """
+
+    html_tag = "iframe"
+
+    def __init__(self, **kwargs):
+        self.domDict.html_tag = "iframe"
+        # List of attributes specific to <iframe> elements
+        for key in [
+            "src",
+            "srcdoc",
+            "name",
+            "width",
+            "height",
+            "allow",
+            "allowfullscreen",
+            "loading",
+            "referrerpolicy",
+            "sandbox",
+        ]:
+            if key in kwargs:
+                self.attrs[key] = kwargs.get(key)
+                self.htmlRender_attr.append(f'''{key}="{kwargs.get(key)}"''')
+                
+    @property
+    def src(self):
+        """
+        The 'src' attribute specifies the URL of the document to be embedded.
+        """
+        return self.attrs.get("src", None)
+
+    @src.setter
+    def src(self, value):
+        if value is not None:
+            self.attrs["src"] = value
+        elif "src" in self.attrs:
+            del self.attrs["src"]
+    
+    @property
+    def width(self):
+        """
+        The 'width' attribute specifies the width of the <iframe>.
+        """
+        return self.attrs.get("width", None)
+
+    @width.setter
+    def width(self, value):
+        if value is not None:
+            self.attrs["width"] = value
+        elif "width" in self.attrs:
+            del self.attrs["width"]
+
+    @property
+    def height(self):
+        """
+        The 'height' attribute specifies the height of the <iframe>.
+        """
+        return self.attrs.get("height", None)
+
+    @height.setter
+    def height(self, value):
+        if value is not None:
+            self.attrs["height"] = value
+        elif "height" in self.attrs:
+            del self.attrs["height"]
+    
+    @property
+    def allowfullscreen(self):
+        """
+        The 'allowfullscreen' attribute specifies if the iframe is allowed to be displayed in full-screen mode.
+        """
+        return self.attrs.get("allowfullscreen", None)
+
+    @allowfullscreen.setter
+    def allowfullscreen(self, value):
+        if value is not None:
+            self.attrs["allowfullscreen"] = value
+        elif "allowfullscreen" in self.attrs:
+            del self.attrs["allowfullscreen"]
+
+            

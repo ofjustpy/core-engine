@@ -59,12 +59,13 @@ class JpConfig(Config):
                 print(f"Simulating latency of {jpconfig.LATENCY} ms")
             jpconfig.HTML_404_PAGE = "ofjustpy is sorry - that path doesn't exist"
             jpconfig.MEMORY_DEBUG = config("MEMORY_DEBUG", cast=bool, default=False)
-            jpconfig.SESSIONS = config("SESSIONS", cast=bool, default=True)
+            jpconfig.SESSIONS = config("SESSIONS", cast=bool, default=False)
+            jpconfig.CACHE_WEBPAGES = config("CACHE_WEBPAGES", cast=bool, default=True)
             jpconfig.SESSION_COOKIE_NAME = config(
                 "SESSION_COOKIE_NAME", cast=str, default="session"
             )
             jpconfig.SECRET_KEY = config(
-                "SECRET_KEY", default="$$$my_secret_string$$$"
+                "SECRET_KEY", default=None
             )  # Make sure to change when deployed
             jpconfig.LOGGING_LEVEL = config("LOGGING_LEVEL", default=logging.WARNING)
             jpconfig.UVICORN_LOGGING_LEVEL = config(
@@ -96,7 +97,7 @@ class JpConfig(Config):
             )
 
             jpconfig.USE_COOKIE_MIDDLEWARE = config(
-                "USE_COOKIE_MIDDLEWARE", cast=bool, default=True
+                "USE_COOKIE_MIDDLEWARE", cast=bool, default=False
             )
 
             jpconfig.USE_SVELTE_SKELETON = config(
@@ -123,7 +124,20 @@ class JpConfig(Config):
                                                           )
 
 
-            # 
+            # WEBPAGE CACHING 
+
+            jpconfig.PASSIVE_WEBPAGE_CACHESIZE  = config("PASSIVE_WEBPAGE_CACHESIZE ",
+                                                          cast =int,
+                                                          default = 10
+                                                          )
+
+            jpconfig.SESSION_WEBPAGE_CACHESIZE  = config("SESSION_WEBPAGE_CACHESIZE ",
+                                                          cast =int,
+                                                          default = 10
+                                                          )            
+            
+
+
             
 
 

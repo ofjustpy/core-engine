@@ -4,8 +4,10 @@ import json
 import logging
 import os
 import sys
-import traceback
 import typing
+import contextlib
+import databases
+
 
 from .jpcore import jpconfig as jpconfig
 from .jpcore import AppDB
@@ -14,7 +16,6 @@ from .jpcore.justpy_app import handle_event
 from .jpcore.justpy_app import JustpyAjaxEndpoint
 from .jpcore.justpy_app import JustpyApp
 from .jpcore.justpy_app import template_options
-from .jpcore.justpy_config import JpConfig
 from .jpcore.utilities import create_delayed_task
 from .jpcore.utilities import run_task
 from starlette.applications import Starlette
@@ -28,10 +29,15 @@ from starlette.responses import JSONResponse
 from starlette.responses import PlainTextResponse
 from starlette.responses import Response
 from starlette.staticfiles import StaticFiles
-from starlette.middleware.sessions import SessionMiddleware
+from .session_middleware import  SessionMiddleware
+#from starlette.middleware.sessions import SessionMiddleware
 from oj_signing_middleware import SerializedSignedCookieMiddleware
 
+from starlette.middleware.base import BaseHTTPMiddleware
 
+
+
+    
 #
 # globals
 #
@@ -41,14 +47,25 @@ if jpconfig.VERBOSE:
     print(current_dir.replace("\\", "/"))
     print(f"Module directory: {current_dir}, Application directory: {os.getcwd()}")
 
+    
 
-def build_app(
-    middlewares=None,
-    APPCLASS=JustpyApp,
-    startup_func=None,
-    cookie_signer_secret_keys=[],
-    cookie_cfg_iter=[
-        {
+    # create a middleware
+
+
+            
+def cookie_cfg(cookie_name,
+               state_attr_name = None,
+               cookie_ttl = 60* 5,
+               path="/",
+               domain=None,
+               secure = False,
+               httponly = False,
+               samesite= "lax"
+               ):
+
+    if not state_attr_name:
+        state_attr_name = cookie_name
+    return {
             "state_attr_name": "ojcookie",
             "cookie_name": "ojcookie",
             "cookie_ttl": 60 * 5,
@@ -60,9 +77,20 @@ def build_app(
                 "samesite": "lax",
             },
         }
+        
+
+    
+def build_app(
+    middlewares=None,
+    APPCLASS=JustpyApp,
+    startup_func=None,
+        shutdown_func = None, 
+    cookie_signer_secret_keys=[],
+    cookie_cfg_iter=[
     ],
         
         middlewares_suffix = None,
+        lifespans = [],
         **kwargs
 ):
     """
@@ -95,19 +123,38 @@ def build_app(
     # implement https://github.com/justpy-org/justpy/issues/535
 
     if jpconfig.SESSIONS:
-       middlewares.append(Middleware(SessionMiddleware, session_cookie = jpconfig.SESSION_COOKIE_NAME,
-                                     secret_key=jpconfig.SECRET_KEY))
+        middlewares.append(Middleware(SessionMiddleware, session_cookie = jpconfig.SESSION_COOKIE_NAME,
+                                      secret_key=jpconfig.SECRET_KEY))
 
 
 
     if middlewares_suffix:
         middlewares.extend(middlewares_suffix)
 
-    print("++++----- ", middlewares)
+
+    @contextlib.asynccontextmanager
+    async def lifespan(app):
+        AppDB.loop = asyncio.get_event_loop()
+        # invoke other lifespances
+        for alifespan in lifespans:
+            await alifespan.__anext__()
+            
+        yield
+
+        for alifespan in lifespans:
+            try:
+                await alifespan.__anext__()
+            except StopAsyncIteration:
+                pass  # This is expected after the first yield
+
+                
+            
+
     app = APPCLASS(
         middleware=middlewares,
         debug=jpconfig.DEBUG,
         cookie_state_attr_names=cookie_state_attr_names,
+        lifespan=lifespan,
         **kwargs
     )
     assert app is not None
@@ -123,21 +170,24 @@ def build_app(
         name="templates",
     )
 
-    @app.on_event("startup")
-    async def justpy_startup():
-        # WebPage.loop = asyncio.get_event_loop()
-        # TBFixed: we need to eventully move to datastore.loop
-        # WebPageStaticBase.loop = asyncio.get_event_loop()
-        print("#%#%#%#%#%#%#%%%% HALLA justpy_startup invoked")
-        AppDB.loop = asyncio.get_event_loop()
 
-        if startup_func:
-            if inspect.iscoroutinefunction(startup_func):
-                await startup_func()
-            else:
-                startup_func()
-        protocol = "https" if jpconfig.SSL_KEYFILE else "http"
-        print(f"JustPy ready to go on {protocol}://{jpconfig.HOST}:{jpconfig.PORT}")
+
+    # moved to lifecycled 
+    # @app.on_event("startup")
+    # async def justpy_startup():
+    #     # WebPage.loop = asyncio.get_event_loop()
+    #     # TBFixed: we need to eventully move to datastore.loop
+    #     # WebPageStaticBase.loop = asyncio.get_event_loop()
+    #     print("#%#%#%#%#%#%#%%%% HALLA justpy_startup invoked")
+    #     AppDB.loop = asyncio.get_event_loop()
+
+    #     if startup_func:
+    #         if inspect.iscoroutinefunction(startup_func):
+    #             await startup_func()
+    #         else:
+    #             startup_func()
+    #     protocol = "https" if jpconfig.SSL_KEYFILE else "http"
+    #     print(f"JustPy ready to go on {protocol}://{jpconfig.HOST}:{jpconfig.PORT}")
 
     @app.route("/zzz_justpy_ajax")
     class AjaxEndpoint(JustpyAjaxEndpoint):
@@ -229,6 +279,7 @@ def build_app(
                 return
 
         async def on_disconnect(self, websocket, close_code):
+            print("websocket disconnect called")
             try:
                 pid = websocket.page_id
             except:

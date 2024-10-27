@@ -116,10 +116,7 @@ async def run_event_function(
                 lambda x, stubStore=stubStore: target_of(x, stubStore),
             )
         except Exception as e:
-            print(
-                "=========================================================> Error in event handling =============================================================="
-            )
-            print("unable to call ", e)
+            logging.error(f"EventRunError : {e}")
             raise e
     return event_result
 
@@ -206,8 +203,9 @@ async def handle_event(data_dict, com_type=0, page_event=False):
             # flush cookies if cookies are being used and
             # flag has been raised
 
-            if p.flush_cookies_flag:
-                await p.flush_cookies()
+            if jpconfig.USE_COOKIE_MIDDLEWARE:
+                if p.flush_cookies_flag:
+                    await p.flush_cookies()
 
         elif com_type == 1:  # Ajax communication
             build_list = p.build_list()

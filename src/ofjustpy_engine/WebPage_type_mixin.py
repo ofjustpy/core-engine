@@ -7,7 +7,7 @@ import asyncio
 
 from .jpcore import AppDB
 from enum import Enum
-
+from .jpcore import jpconfig
 class WebPageType(Enum):
     PASSIVE_STATIC = 'PassiveStatic'
     RESPONSIVE_STATIC = 'ResponsiveStatic'
@@ -29,11 +29,18 @@ class WebPageMixin:
 
         # TODO: probably not required; revisit page caching
         self.use_cache = False  # Determines whether the page uses the cache or not
-        self.session_manager = kwargs.get("session_manager")
-        assert self.session_manager is not None
-        self.page_id = (
-            self.session_manager.session_id + ":" + self.staticCore.id
-        )
+        if jpconfig.SESSIONS:
+            self.session_manager = kwargs.get("session_manager")
+            self.page_id = (
+                self.session_manager.session_id + ":" + self.staticCore.id
+            )
+        else:
+            # SESSIONS is not enabled; session_id is not set; 
+            self.session_manager = None
+            self.page_id = ("None:" + 
+                            self.staticCore.id
+                            )
+            
         self.display_url = ''
         self.redirect = ''
         self.open = None
@@ -53,7 +60,8 @@ class WebPageMixin:
         
         self.webpage_type = WebPageType.RESPONSIVE_STATIC
         AppDB.pageId_to_webpageInstance[self.page_id] = self
-
+        self.is_active = 1
+        self.is_cached = False
         if 'template_file' in kwargs:
             self.template_file = kwargs.get('template_file')
             
@@ -225,11 +233,20 @@ class WebPageMixin:
         skeleton_utilities.triggerToast("{msg}");
         """)
     async def on_disconnect(self, websocket=None):
-        self.is_active = False
-        if self.is_cached == False:
-            self.session_manager.schedule_page_removal(self)
-        else:
-            pass
+        # don't do anything if caching is not enabled
+        if not jpconfig.CACHE_WEBPAGES:
+            return
+        
+        self.is_active -= 1
+        if self.is_active == 0:
+            if self.is_cached == False:
+                if jpconfig.SESSIONS:
+                    self.session_manager.schedule_page_removal(self)
+                else:
+                    # Purge the nosession/passive page
+                    self.purge_page()
+                    pass
+
         pass
 
     def purge_page(self):
