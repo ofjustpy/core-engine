@@ -491,7 +491,6 @@ class EventMixinBase:
             if not self.event_prehook:
                 self.event_handlers["on_" + event_type] = func
             else:
-                print(f"self.event_prehook attached to {func}")
                 self.event_handlers["on_" + event_type] = self.event_prehook(func)
                 pass
 
@@ -554,14 +553,6 @@ class EventMixinBase:
     @events.setter
     def events(self, value):
         self.domDict.events = value
-
-    # @property
-    # def event_modifiers(self):
-    #     return self.domDict.event_modifiers
-
-    # @event_modifiers.setter
-    # def event_modifiers(self, value):
-    #     self.domDict.event_modifiers = value
 
     @property
     def event_propagation(self):

@@ -63,11 +63,6 @@ class PassiveJsonMixin(StaticJsonMixin):
         StaticJsonMixin.__init__(self, *args, **kwargs)
 
         pass
-    
-    # def get_changed_diff_patch(self, parent_hidden=False):
-    #     yield
-    #     return
-    
 
     
 class ActiveJsonMixin(StaticJsonMixin):
@@ -78,11 +73,7 @@ class ActiveJsonMixin(StaticJsonMixin):
     def __init__(self, *args, **kwargs):
         StaticJsonMixin.__init__(self, *args, **kwargs)
 
-    # def get_changed_diff_patch(self, parent_hidden=False):
-        
-    #     yield
-    #     return 
-    
+
 class HCCPassiveJsonMixin(StaticJsonMixin):
     def __init__(self, *args, **kwargs):
         StaticJsonMixin.__init__(self, *args, **kwargs)
@@ -150,11 +141,7 @@ class DataValidators:
 
 
 
-class StaticCore(
-        # TR.jpBaseComponentMixin,
-    TR.TwStyMixin,
-    TR.DOMEdgeMixin,
-):
+class StaticCore:
     """
     provides baseComponent (id, show, debounce, etc)
              divBase: (text, object_props)
@@ -164,14 +151,6 @@ class StaticCore(
     def __init__(self, *args, **kwargs):
         self.domDict = Dict()
         self.attrs = Dict()
-
-
-        TR.DOMEdgeMixin.__init__(
-            self, *args, domDict=self.domDict, attrs=self.attrs, **kwargs
-        )
-        TR.TwStyMixin.__init__(
-            self, *args, domDict=self.domDict, attrs=self.attrs, **kwargs
-        )
         
     @property
     def html_tag(self):
@@ -182,30 +161,6 @@ class StaticCore(
         self.domDict.html_tag = value
         
 
-
-# class HCCStaticMixin:
-#     def __init__(self, **kwargs):
-#         # active childs are not added via stub-callable route
-#         # the target is directly added
-#         self.components = kwargs.get("childs", [])
-
-
-# class HCCMixin:
-#     def __init__(self, **kwargs):
-#         self.components = kwargs.get("childs")
-
-#     def add_register_childs(self):
-#         for achild in self.components:
-#             # call the child stubs -- so that
-#             # active childs can be registered
-#             # but ignore the stubs as the child
-#             # is already added as part of components
-#             stub = achild.stub()
-#             # invoke __call_ of stub
-#             # to assign id, build json
-#             stub(self, attach_to_parent=False)
-
-# TODO: rename/refactor to HCCStaticMixin
 class HCCStaticMixin:
     """
 
@@ -225,26 +180,16 @@ class HCCStaticMixin:
 
         for achild in self.components:
             stub = achild.stub()
-            # invoke __call_ of stub
-            # to assign id, build json
             stub(self, attach_to_parent=False)
 
             
-# build_renderHtml will be done in TF_impl
-# after add_register_childs calls
-
 class HCCPassiveMixin(HCCStaticMixin):
     def __init__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
 
 
-
-        
 class HCCActiveMixin(HCCStaticMixin):
     """
-    Ideally we should have post_id_assign_callback here
-    as well as with renderHTML.
-    add_register_childs is called by renderHTML
     """
     def __init__(self, *args, **kwargs):
         super().__init__(self, *args, **kwargs)
@@ -267,7 +212,34 @@ class PassiveHC_RenderHTMLMixin:
     def to_html_iter(self):
         yield self.htmlRender
 
+class ActiveHC_RenderHTMLMixin:
+    # We cannot build_renderHtml at init.
+    # because id is assigned by assign_id which is called
+    # after the object has been initialized
+    
+    def __init__(self, *args, **kwargs):
+        pass
 
+    # Ideally call should be part of final class
+    # and not belong to this mixin: keeping here
+    # for less code
+    def post_id_assign_callback(self):
+        self.build_renderHtml()
+        pass
+    def build_renderHtml(self):
+        self.htmlRender = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
+
+    def prepare_htmlRender(self):
+        # mutable shell's staticCore have
+        # prepare_htmlRender which gets
+        # updated after update to attrs
+        self.build_renderHtml()
+
+    
+    def to_html_iter(self):
+        yield self.htmlRender
+
+        
 
 class ActiveDiv_RenderHTMLMixin:
     def __init__(self, *args, **kwargs):
@@ -300,32 +272,6 @@ class ActiveDiv_RenderHTMLMixin:
         yield self.htmlRender_close_tag
 
 
-class ActiveHC_RenderHTMLMixin:
-    # We cannot build_renderHtml at init.
-    # because id is assigned by assign_id which is called
-    # after the object has been initialized
-    
-    def __init__(self, *args, **kwargs):
-        pass
-
-    # Ideally call should be part of final class
-    # and not belong to this mixin: keeping here
-    # for less code
-    def post_id_assign_callback(self):
-        self.build_renderHtml()
-        pass
-    def build_renderHtml(self):
-        self.htmlRender = f'''<{self.html_tag} {" ".join(self.htmlRender_attr)}>{"".join(self.htmlRender_body)}</{self.html_tag}>'''
-
-    def prepare_htmlRender(self):
-        # mutable shell's staticCore have
-        # prepare_htmlRender which gets
-        # updated after update to attrs
-        self.build_renderHtml()
-
-    
-    def to_html_iter(self):
-        yield self.htmlRender
 
 
 
@@ -364,7 +310,7 @@ def staticClassTypeGen(
     attach_event_handling=False,
     http_request_callback_mixin=HTTPRequestCallbackMixin,
     addon_mixins=[],
-        html_tag = None,
+    html_tag = None,
     **rwargs,
 ):
     """
@@ -379,9 +325,14 @@ def staticClassTypeGen(
         self.htmlRender_attr = []
         self.htmlRender_body = []
 
-        # allocate/initalize self.domDict, self.attrs
+        #. its important  that baseComponentMixinType is invoked first
+        #. see .icons.py
         StaticCore.__init__(self, *args, **kwargs)
         baseComponentMixinType.__init__(self, *args, **kwargs)
+        TR.TwStyMixin.__init__(
+            self, *args, **kwargs
+        )
+        TR.DOMEdgeMixin.__init__(self, *args, **kwargs)
         tagtype.__init__(self, *args, **kwargs)
         TR.SvelteSafelistMixin.__init__(self, *args, **kwargs)
         
@@ -430,6 +381,8 @@ def staticClassTypeGen(
         if attach_event_handling:
             base_types = (
                 StaticCore,
+                TR.TwStyMixin,
+                TR.DOMEdgeMixin,
                 baseComponentMixinType,
                 jsonMixinType,
                 tagtype,
@@ -445,6 +398,8 @@ def staticClassTypeGen(
 
         else:
             base_types = (StaticCore,
+                          TR.TwStyMixin,
+                          TR.DOMEdgeMixin,
                           baseComponentMixinType,
                           TR.SvelteSafelistMixin,
                           TR.PassiveKeyMixin,
@@ -457,6 +412,8 @@ def staticClassTypeGen(
         if attach_event_handling:
             base_types = (
                 StaticCore,
+                TR.TwStyMixin,
+                TR.DOMEdgeMixin,
                 baseComponentMixinType,
                 TR.SvelteSafelistMixin,
                 jsonMixinType,
@@ -471,6 +428,8 @@ def staticClassTypeGen(
             )
         else:
             base_types = (StaticCore,
+                          TR.TwStyMixin,
+                          TR.DOMEdgeMixin,
                           baseComponentMixinType,
                           TR.SvelteSafelistMixin,
                           TR.PassiveKeyMixin,

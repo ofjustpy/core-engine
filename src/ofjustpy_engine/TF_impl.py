@@ -29,22 +29,13 @@ Stubs also create/refresh json_obj of the object.
 
 7. Stub_HCCMutable
 
-mutable Stubs are generated via gen_Stub generated
+mutable Stubs are generated via gen_Stub generator
 so that the instance can be tracked on stubStore
 """
 from aenum import Enum
 
 from .tracker import trackStub
 
-
-# class HCType(Enum):
-#     passive = "passive"  # implies static div/hc; for div implies passive/active childs
-#     active = "active"  # implies active div/hc; for div imples passive/active childs
-#     mutable = (
-#         "css_mutable"  # implies mutable div/hc; if div then imples css-mutable childs
-#     )
-#     hcc_mutable_div = "hcc_mutable"  # for div only; twstags is static/unmutable; only childs are mutable
-#     hcc_static_div = "static_hcc_div"  # for div only; twstags of div is mutable; but childs are static/active
 
 
 class StubTag:
@@ -145,17 +136,6 @@ class Stub_DivPassive(Stub_HCPassive):
 
     def register_childrens(self):
         self.target.add_register_childs()
-        # all the childs have been added
-        
-        # for achild in self.target.components:
-        #     #call the child stubs -- so that
-        #     #active childs can be registered
-        #     #but ignore the stubs as the child
-        #     #is already registered.
-        #     stub = achild.stub()
-        #     # invoke __call_ of stub
-        #     # to assign id, build json
-        #     stub(self, attach_to_parent=False)
 
 
 class Stub_HCActive(Stub_HCStatic):
@@ -322,7 +302,7 @@ class Stub_HCMutable:
 
 # ================================ end ===============================
 
-# TODO: need to refactor all the Stub 
+
 class Stub_DivMutable:
     """
     childs are  mutable.

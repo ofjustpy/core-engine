@@ -55,7 +55,7 @@ if jpconfig.VERBOSE:
             
 def cookie_cfg(cookie_name,
                state_attr_name = None,
-               cookie_ttl = 60* 5,
+               max_age = 14 * 24 * 60 * 60,  # 14 days, in seconds
                path="/",
                domain=None,
                secure = False,
@@ -66,15 +66,15 @@ def cookie_cfg(cookie_name,
     if not state_attr_name:
         state_attr_name = cookie_name
     return {
-            "state_attr_name": "ojcookie",
-            "cookie_name": "ojcookie",
-            "cookie_ttl": 60 * 5,
+            "state_attr_name": state_attr_name,
+            "cookie_name": cookie_name,
+            "max_age": cookie_ttl,
             "properties": {
                 "path": "/",
                 "domain": None,
                 "secure": False,
-                "httponly": False,
-                "samesite": "lax",
+                "https_only": False,
+                "samesite": samesite,
             },
         }
         
@@ -114,8 +114,11 @@ def build_app(
                     secret=secret_key,
                     state_attribute_name=cookie_cfg["state_attr_name"],
                     cookie_name=cookie_cfg["cookie_name"],
-                    cookie_ttl=cookie_cfg["cookie_ttl"],
-                    cookie_properties=cookie_cfg.get("properties", {}),
+                    max_age=cookie_cfg["max_age"],
+                    path = cookie_cfg["properties"]["path"], 
+                    same_site = cookie_cfg["properties"]["samesite"],
+                    https_only = cookie_cfg["properties"]["https_only"],
+                    domain = cookie_cfg["properties"]["domain"]
                 )
             )
             cookie_state_attr_names.append(cookie_cfg["state_attr_name"])
@@ -170,24 +173,6 @@ def build_app(
         name="templates",
     )
 
-
-
-    # moved to lifecycled 
-    # @app.on_event("startup")
-    # async def justpy_startup():
-    #     # WebPage.loop = asyncio.get_event_loop()
-    #     # TBFixed: we need to eventully move to datastore.loop
-    #     # WebPageStaticBase.loop = asyncio.get_event_loop()
-    #     print("#%#%#%#%#%#%#%%%% HALLA justpy_startup invoked")
-    #     AppDB.loop = asyncio.get_event_loop()
-
-    #     if startup_func:
-    #         if inspect.iscoroutinefunction(startup_func):
-    #             await startup_func()
-    #         else:
-    #             startup_func()
-    #     protocol = "https" if jpconfig.SSL_KEYFILE else "http"
-    #     print(f"JustPy ready to go on {protocol}://{jpconfig.HOST}:{jpconfig.PORT}")
 
     @app.route("/zzz_justpy_ajax")
     class AjaxEndpoint(JustpyAjaxEndpoint):
@@ -315,80 +300,6 @@ def build_app(
                 print("************************")
 
     return app
-
-
-def initial_func(_request):
-    """
-    Default func/endpoint to be called if none has been specified
-    """
-    # wp = WebPage()
-    # Div(
-    #     text="JustPy says: Page not found",
-    #     classes="inline-block text-5xl m-3 p-3 text-white bg-blue-600",
-    #     a=wp,
-    # )
-    # return wp
-    assert False
-
-
-func_to_run = initial_func
-
-
-def server_error_func(request):
-    # wp = WebPage()
-    # Div(
-    #     text="JustPy says: 500 - Server Error",
-    #     classes="inline-block text-5xl m-3 p-3 text-white bg-red-600",
-    #     a=wp,
-    # )
-    # return wp
-    assert False
-
-
-# def Route(path: str, wpfunc: typing.Callable):
-#     """
-#     legacy Route handling
-
-#     Args:
-#         path (str): the path of the route to add
-#         wpfunc(Callable): a WebPage returning function to be added
-#     """
-#     app.add_jproute(path, wpfunc)
-
-
-# jp.justpy entry point has been removed
-# use uvicorn from command line
-
-
-def convert_dict_to_object(d):
-    """
-    convert the given dict to an object
-    """
-    obj = globals()[d["class_name"]]()
-    for obj_prop in d["object_props"]:
-        obj.add(convert_dict_to_object(obj_prop))
-    # combine the dictionaries
-    for k, v in {**d, **d["attrs"]}.items():
-        if k != "id":
-            obj.__dict__[k] = v
-    return obj
-
-
-def redirect(url: str):
-    """
-    redirect to the given url
-
-    Args:
-        url(str): the url to redirect to
-
-    Returns:
-        a WebPage with a single Div that hat the redirect
-    """
-    # wp = WebPage()
-    # wp.add(Div())
-    # wp.redirect = url
-    # return wp
-    assert False
 
 
 def report_memory_usage():

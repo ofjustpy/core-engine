@@ -45,7 +45,6 @@ class SessionManager:
     def __init__(self, request):
         self.stubStore = Dict(track_changes=True)
         self.appstate = Dict(track_changes=True)
-
         self.session_id = request.session["session_id"]
         self.request = request
         # cache (see below) populates the activ_connections with page_ids

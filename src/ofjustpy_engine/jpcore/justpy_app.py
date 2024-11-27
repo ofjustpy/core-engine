@@ -152,8 +152,8 @@ async def handle_event(data_dict, com_type=0, page_event=False):
         c = p
     else:
         component_id = event_data["id"]
+        print ("now handling event at component_id = ", component_id)
         c = dget(p.session_manager.stubStore, component_id).target
-
         if c is not None:
             event_data["target"] = c
         else:
@@ -401,128 +401,6 @@ class JustpyApp(Starlette):
                 load_page = func_to_run()
         return load_page
 
-    # def get_response_for_load_page(self, request, load_page):
-    #     """
-    #     get the response for the given webpage
-
-    #     Args:
-    #         request(Request): the request to handle
-    #         load_page(WebPage): the webpage to wrap with justpy and
-    #         return as a full HtmlResponse
-
-    #     Returns:
-    #         Reponse: the response for the given load_page
-    #     """
-    #     page_options = {
-    #         "reload_interval": load_page.reload_interval,
-    #         "body_style": load_page.body_style,
-    #         "body_classes": load_page.classes,
-    #         "css": load_page.css,
-    #         "head_html": load_page.head_html,
-    #         "body_html": load_page.body_html,
-    #         "display_url": load_page.display_url,
-    #         # "dark": load_page.dark,
-    #         "title": load_page.title,
-    #         "redirect": load_page.redirect,
-    #         "debug": load_page.debug,
-    #         "events": load_page.events,
-    #         "favicon": load_page.favicon if load_page.favicon else jpconfig.FAVICON,
-    #     }
-
-    #     if load_page.use_cache:
-    #         page_dict = load_page.cache
-    #     else:
-    #         if hasattr(load_page, "to_json_optimized"):
-    #             page_json = load_page.build_json()
-    #             pass
-    #         else:
-    #             page_dict = load_page.build_list()
-    #             page_json = json.dumps(page_dict, default=str)
-
-    #     context = {
-    #         "request": request,
-    #         "page_id": load_page.page_id,
-    #         "justpy_dict": page_json,
-    #         "use_websockets": json.dumps(
-    #             load_page.use_websockets
-    #         ),  # json.dumps(WebPage.use_websockets),
-    #         "options": template_options,
-    #         "page_options": page_options,
-    #         "html": load_page.html,
-    #         "frontend_engine_type": jpconfig.FRONTEND_ENGINE_TYPE,
-    #         "frontend_engine_libs": jpconfig.FRONTEND_ENGINE_LIBS,
-    #     }
-    #     # wrap the context in a context object to make it available
-
-    #     if not load_page.use_websockets:
-    #         logging.info("websocket turned off for this page")
-    #     context_obj = Context(context)
-    #     context["context_obj"] = context_obj
-    #     response = templates.TemplateResponse(load_page.template_file, context)
-
-    #     return response
-
-    # def handle_session_cookie(self, request) -> typing.Union[bool, Response]:
-    #     """
-    #     handle the session cookie for this request
-
-    #     Returns:
-    #         True if a new cookie and session has been created
-    #     """
-    #     # Handle web requests
-    #     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ in handle_session_cookie")
-    #     session_cookie = request.cookies.get(jpconfig.SESSION_COOKIE_NAME)
-    #     print(f"{jpconfig.SESSION_COOKIE_NAME} {session_cookie}")
-    #     new_cookie = None
-    #     if jpconfig.SESSIONS:
-    #         new_cookie = False
-    #         if session_cookie:
-    #             try:
-    #                 session_id = cookie_signer.unsign(session_cookie).decode("utf-8")
-    #             except:
-    #                 return PlainTextResponse("Bad Session")
-    #             request.state.session_id = session_id
-    #             request.session_id = session_id
-    #             print ("DELIVERING Existing COOOKIE ", request.session_id)
-    #         else:
-    #             # Create new session_id
-    #             print ("DELIVERING NEW COOOKIE ")
-    #             request.state.session_id = str(uuid.uuid4().hex)
-    #             request.session_id = request.state.session_id
-    #             new_cookie = True
-    #             logging.debug(f"New session_id created: {request.session_id}")
-    #     return new_cookie
-
-    # def set_cookie(
-    #     self, request, response, load_page, new_cookie: typing.Union[bool, Response]
-    # ):
-    #     """
-    #     set the cookie_value
-
-    #     Args:
-    #         request: the request
-    #         response: the response to be sent
-    #         load_page(WebPage): the WebPage to handle
-    #         new_cookie(bool|Response): True if there is a new cookie. Or Response if cookie was invalid
-    #     """
-    #     if isinstance(new_cookie, Response):
-    #         #print("returning without cookie setting")
-    #         return new_cookie
-
-    #     if jpconfig.SESSIONS and new_cookie:
-    #         cookie_value = cookie_signer.sign(request.state.session_id)
-    #         cookie_value = cookie_value.decode("utf-8")
-    #         response.set_cookie(
-    #             jpconfig.SESSION_COOKIE_NAME,
-    #             cookie_value,
-    #             max_age=jpconfig.COOKIE_MAX_AGE,
-    #             httponly=True,
-    #         )
-    #         logging.debug(
-    #             f"set signed cookie name={jpconfig.SESSION_COOKIE_NAME} in response object"
-    #         )
-
-    #     return response
 
 
 class JustpyAjaxEndpoint(HTTPEndpoint):

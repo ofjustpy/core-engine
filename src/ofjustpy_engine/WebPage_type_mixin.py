@@ -152,8 +152,7 @@ class WebPageMixin:
         if self.to_json_optimized:
             # ================== Use optimized json ==================
             json_to_send = f"""{{ "type": "diff_patch_update",  "data" : {{ {",".join(self.get_changed_diff_patch())} }}    }}"""
-
-
+            
             if websocket:
                 AppDB.loop.create_task(websocket.send_text(json_to_send))
             else:

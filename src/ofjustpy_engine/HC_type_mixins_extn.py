@@ -1702,9 +1702,8 @@ class FontAwesomeIconMixin:
         self.domDict.vue_type= "fontawesome_component"
         self.domDict.html_tag = "svg"
         self.domDict["icon_label"] = kwargs.get("label")
-        self.domDict["fa_group"] = kwargs.get("fa_group", "solid") 
-        
-        
+        self.domDict["fa_group"] = kwargs.get("fa_group", "solid")
+
         for key in ["size",
                     "pulse",
                     "flip",
@@ -1713,6 +1712,7 @@ class FontAwesomeIconMixin:
                     "transform",
                     "inverse",
                     "beat",
+                    "spin"
                     ]:
             if key in kwargs:
                 self.attrs[key] = kwargs.get(key)
