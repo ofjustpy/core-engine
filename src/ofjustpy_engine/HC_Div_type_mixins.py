@@ -348,7 +348,6 @@ class TwStyMixin:
                 self.domDict.classes = "" + " " + self.extra_classes
             else:
                 self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes
-
             
         else:
             self.twsty_tags = []
@@ -373,6 +372,7 @@ class TwStyMixin:
     def remove_twsty_tags(self, *args):
         for _ in args:
             remove_from_twtag_list(self.twsty_tags, _)
+            
         self.domDict.classes = tstr(*self.twsty_tags) + " " + self.extra_classes
         self.htmlRender_attr[0] =  f'''class="{self.classes}"'''
 

@@ -1347,6 +1347,19 @@ class BrMixin:
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "br"
 
+        
+class Hr:
+    """
+    The `Hr` class represents the HTML `<hr>` (horizontal rule) element.
+    """
+    
+    html_tag = "hr"
+    
+    def __init__(self, *args, **kwargs):
+        self.domDict = {}  # Ensure domDict exists
+        self.domDict["html_tag"] = "hr"
+
+        
 
 class TimeMixin:
     """
@@ -1372,6 +1385,38 @@ class TbodyMixin:
 
     def __init__(self, *args, **kwargs):
         self.domDict.html_tag = "tbody"
+
+
+class CiteMixin:
+    """
+    cite
+    """
+
+    html_tag = "cite"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "cite"
+
+class SupMixin:
+    """
+    superscript
+    """
+
+    html_tag = "sup"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "sup"                
+
+
+class SubMixin:
+    """
+    subscript
+    """
+
+    html_tag = "sub"
+
+    def __init__(self, *args, **kwargs):
+        self.domDict.html_tag = "sub"                
 
         
 class TrMixin:
