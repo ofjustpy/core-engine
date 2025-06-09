@@ -283,8 +283,20 @@ class DivMixin:
         self.domDict.html_tag = "div"
         self.domDict.class_name = "Div"
 
-    pass
+        pass
 
+#     @property
+#     def html_tag(self):
+#         return self.domDict.html_tag
+
+#     @html_tag.setter
+#     def html_tag(self, value):
+#         self.domDict.html_tag = value
+
+class HtmlTagMixin:
+    def __init__(self, *args, **kwargs):
+        pass
+    
     @property
     def html_tag(self):
         return self.domDict.html_tag
@@ -292,6 +304,10 @@ class DivMixin:
     @html_tag.setter
     def html_tag(self, value):
         self.domDict.html_tag = value
+
+
+
+
 
 class SvelteSafelistMixin:
     """

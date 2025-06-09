@@ -109,12 +109,12 @@ class ButtonMixin:
         """
         return self.domDict.get("value", None)
 
-    # @value.setter
-    # def value(self, value):
-    #     if value is not None:
-    #         self.domDict["value"] = value
-    #     elif "value" in self.domDict:
-    #         del self.domDict["value"]
+    @value.setter
+    def value(self, val):
+        self.htmlRender_attr.remove(f'''value="{self.domDict["value"]}"''')
+        self.domDict["value"] = val
+        self.htmlRender_attr.append(f'''value="{val}"''')
+        
 
     @property
     def autofocus(self):
@@ -305,6 +305,13 @@ class TextInputMixin(InputMixin):
         """
         return self.domDict.get("value", None)
     
+    @value.setter
+    def value(self, val):
+        self.htmlRender_attr.remove(f'''value="{self.domDict["value"]}"''')
+        self.domDict["value"] = val
+        self.htmlRender_attr.append(f'''value="{val}"''')
+            
+         
     @property
     def autocomplete(self):
         return self.attrs["autocomplete"]
@@ -1872,6 +1879,76 @@ class FontAwesomeIconMixin:
         elif "inverse" in self.attrs:
             del self.attrs["inverse"]
 
+
+class LucideIconMixin:
+    def __init__(self, **kwargs):
+        """
+          
+        """
+        self.domDict.vue_type= "lucide_component"
+        self.domDict.html_tag = "svg"
+        self.domDict["icon_label"] = kwargs.get("label")
+
+        for key in ["size",
+                    "color",
+                    "strokeWidth",
+		    "absoluteStrokeWidth",
+                    "fill"
+                    ]:
+            if key in kwargs:
+                self.attrs[key] = kwargs.get(key)
+                self.htmlRender_attr.append(f'''{key}="{self.attrs[key]}"''')
+
+
+    @property
+    def size(self):
+        """
+        The 'size' attribute of the <button> element specifies the size of the button.
+        """
+        return self.attrs.get("size", None)
+
+    @size.setter
+    def size(self, value):
+        if value is not None:
+            self.attrs["size"] = value
+        elif "size" in self.attrs:
+            del self.attrs["size"]
+  # Getter and Setter for 'color'
+    @property
+    def color(self):
+        return self.attrs.get("color", "currentColor")
+
+    @color.setter
+    def color(self, value):
+        if value is not None:
+            self.attrs["color"] = value
+        elif "color" in self.attrs:
+            del self.attrs["color"]
+
+    # Getter and Setter for 'strokeWidth'
+    @property
+    def strokeWidth(self):
+        return self.attrs.get("strokeWidth", 2)
+
+    @strokeWidth.setter
+    def strokeWidth(self, value):
+        if value is not None:
+            self.attrs["strokeWidth"] = value
+        elif "strokeWidth" in self.attrs:
+            del self.attrs["strokeWidth"]
+
+    # Getter and Setter for 'absoluteStrokeWidth'
+    @property
+    def absoluteStrokeWidth(self):
+        return self.attrs.get("absoluteStrokeWidth", False)
+
+    @absoluteStrokeWidth.setter
+    def absoluteStrokeWidth(self, value):
+        if value is not None:
+            self.attrs["absoluteStrokeWidth"] = value
+        elif "absoluteStrokeWidth" in self.attrs:
+            del self.attrs["absoluteStrokeWidth"]
+            
 
 class IframeMixin:
     """
